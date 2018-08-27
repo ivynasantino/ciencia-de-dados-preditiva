@@ -1,0 +1,30 @@
+---
+title: "Análise dos gastos dos deputados"
+author: "Ivyna Santino"
+date: "26 de agosto de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+dadosCEAP = read_csv(here("data/dadosCEAP.csv"))
+```
+
+Perguntas:
+
+1. Quais são os deputados que gastaram mais dinheiro da CEAP? Quais são os mais econômicos? 
+2. Quais os estados cujos deputados gastam mais no exterior? Quais os estados cujos deputados gastam menos no exterior? 
+3. Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
+4. Quais os deputados que mais ultrapassam o limite de CEAP do seu estado? 
+5. Quais estados cujos parlamentares gastam mais com passagens aéreas? 
+6. Escolha três partidos e responda: Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos? Mesma pergunta considerando valores em R$.
+
+
+
+

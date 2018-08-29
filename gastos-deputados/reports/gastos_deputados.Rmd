@@ -115,14 +115,47 @@ dadosCEAP %>%
   
 ```
 
+
 ```{r}
 # Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
 dadosCEAP %>% 
   filter(sgUF == "PB") %>% 
   group_by(sgPartido) %>% 
   summarise(valorCEAP = sum(valorLíquido),
-            count = n())
+            countGastos = n()) %>% 
+  ggplot(aes(x = reorder(sgPartido, -valorCEAP),
+             y = countGastos,
+             fill = valorCEAP)) +
+  geom_col(position = position_identity()) +
+  labs(title = "Quantidade de gastos por partido",
+       x = "Partidos",
+       y = "Quantidade de gastos")
   
+```
+
+
+```{r}
+# Quais os deputados que mais ultrapassam o limite de CEAP do seu estado? 
+limitePB <- limiteCEAP %>% 
+  filter(UF == "PB")
+
+dadosCEAP %>% 
+  filter(sgUF == "PB") %>% 
+  group_by(nomeParlamentar) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>% 
+  filter(valorTot > limitePB$limite_mensal) %>% 
+  slice(1:10) %>% 
+  na.omit(.) %>% 
+  ggplot(aes(x = reorder(nomeParlamentar, -valorTot),
+             y = valorTot,
+             color = "red")) +
+  geom_point() +
+  coord_flip()
+
+```
+
+```{r}
+
 ```
 
 

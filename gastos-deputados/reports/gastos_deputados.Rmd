@@ -1,12 +1,17 @@
 ---
 title: "Análise dos gastos dos deputados"
 author: "Ivyna Santino"
-date: "26 de agosto de 2018"
-output: html_document
+date: "29 de agosto de 2018"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, warning=FALSE}
 library(tidyverse)
 library(here)
 ```
@@ -15,6 +20,7 @@ Para iniciarmos nossa análise, o primeiro passo é importar os dados do csv par
 
 ```{r, message=FALSE}
 dadosCEAP = read_csv(here("data/dadosCEAP.csv"))
+limiteCEAP = read_csv(here("data/limiteMensalCEAP.csv"))
 ```
 
 Dados fornecidos:
@@ -50,21 +56,73 @@ Perguntas:
 ```{r}
 # 1a)
 dadosCEAP %>% 
-  group_by(nomeParlamentar, idCadastro) %>% 
-  summarise(valorTot = sum(valorLíquido)) %>% 
-  arrange(-valorTot)
+  group_by(nomeParlamentar) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>%
+  filter(valorTot >= 0) %>% 
+  arrange(-valorTot) %>% 
+  slice(1:10) %>% 
+  na.omit(.) %>% 
+  ggplot(aes(x = reorder(nomeParlamentar, valorTot),
+             y = valorTot,
+             fill = valorTot)) +
+  geom_col(position = position_identity()) +
+  labs(y = "Valor gasto total",
+       x = "Nome do candidato",
+       title = "Top 10 dos candidatos mais gastosos") +
+  coord_flip()
 ```
 
 
 ```{r}
 # 1b)
 dadosCEAP %>% 
-  group_by(nomeParlamentar, idCadastro) %>% 
-  summarise(valorTot = sum(valorLíquido)) %>% 
-  arrange(valorTot)
-
+  group_by(nomeParlamentar) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>%
+  filter(valorTot >= 0) %>% 
+  arrange(valorTot) %>% 
+  slice(1:10) %>% 
+  na.omit(.) %>% 
+  ggplot(aes(x = reorder(nomeParlamentar, -valorTot),
+             y = valorTot,
+             fill = valorTot)) +
+  geom_col(position = position_identity()) +
+  labs(y = "Valor gasto total",
+       x = "Nome do candidato",
+       title = "Top 10 dos candidatos menos gastosos") +
+  coord_flip()
 ```
 
 
+```{r}
+# 2
+dadosCEAP %>% 
+  filter(tipoDocumento == 2) %>% 
+  group_by(sgUF) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>%
+  arrange(-valorTot) %>% 
+  na.omit(.) %>% 
+  ggplot(aes(x = reorder(sgUF, -valorTot),
+             y = valorTot,
+             color = sgUF)) +
+  geom_point() +
+  geom_segment(aes(x = reorder(sgUF, -valorTot),
+                   xend = reorder(sgUF, -valorTot),
+                   y = 0,
+                   yend = valorTot)) +
+  labs(x = "UF",
+       y = "Valor gasto total",
+       title = "Gastos de cada estado no exterior")
+  
+```
+
+```{r}
+# Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
+dadosCEAP %>% 
+  filter(sgUF == "PB") %>% 
+  group_by(sgPartido, nomeParlamentar) %>% 
+  summarise(valorCEAP = sum(valorLíquido)) %>% 
+  arrange(-valorCEAP) 
+  
+```
 
 

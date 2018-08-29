@@ -119,9 +119,9 @@ dadosCEAP %>%
 # Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
 dadosCEAP %>% 
   filter(sgUF == "PB") %>% 
-  group_by(sgPartido, nomeParlamentar) %>% 
-  summarise(valorCEAP = sum(valorLíquido)) %>% 
-  arrange(-valorCEAP) 
+  group_by(sgPartido) %>% 
+  summarise(valorCEAP = sum(valorLíquido),
+            count = n())
   
 ```
 

@@ -1,5 +1,5 @@
 ---
-title: "Análise dos gastos dos deputados"
+title: "Análise de gastos dos deputados"
 author: "Ivyna Santino"
 date: "29 de agosto de 2018"
 output:
@@ -22,12 +22,12 @@ Introdução: o que é o checkpoint e que dados iremos trabalhar.
 
 Para iniciarmos nossa análise, o primeiro passo é importar nossos dados.
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, include=FALSE}
 dadosCEAP = read_csv(here("data/dadosCEAP.csv"))
 limiteCEAP = read_csv(here("data/limiteMensalCEAP.csv"))
 ```
 
-  Dados fornecidos:
+Dados fornecidos:
   
   - nomeParlamentar: Nome adotado pelo Parlamentar ao tomar posse do seu mandato.
   - idCadastro: Número que identifica unicamente um deputado federal na CD.
@@ -46,15 +46,6 @@ limiteCEAP = read_csv(here("data/limiteMensalCEAP.csv"))
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 dadosCEAP$valorGlosa <- as.numeric(sub(",", ".", dadosCEAP$valorGlosa, fixed = TRUE)) 
 ```
-
-Perguntas:
-
-1. Quais são os deputados que gastaram mais dinheiro da CEAP? Quais são os mais econômicos? 
-2. Quais os estados cujos deputados gastam mais no exterior? Quais os estados cujos deputados gastam menos no exterior? 
-3. Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
-4. Quais os deputados que mais ultrapassam o limite de CEAP do seu estado? 
-5. Quais estados cujos parlamentares gastam mais com passagens aéreas? 
-6. Escolha três partidos e responda: Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos? Mesma pergunta considerando valores em R$.
 
 ### Quais os deputados que mais gastaram dinheiro da CEAP?
 
@@ -76,9 +67,8 @@ dadosCEAP %>%
   coord_flip()
 ```
 
-#### Quais os mais ecoômicos?
+### Quais os mais ecoômicos?
 ```{r, message=FALSE}
-# 1b) Quais são os mais econômicos? 
 dadosCEAP %>% 
   group_by(nomeParlamentar) %>% 
   summarise(valorTot = sum(valorLíquido)) %>%
@@ -161,7 +151,7 @@ dadosCEAP %>%
   geom_point() +
   coord_flip() +
   labs(title = "Top 10 dos deputados que ultrapassaram o limite de CEAP na PB",
-       y = "Valor em R$",
+       y = "Valor em (R$)",
        x = "Nome do deputado")
 
 ```
@@ -189,9 +179,8 @@ dadosCEAP %>%
 
 ```
 
-```{r, message=FALSE}
-# Escolha três partidos e responda: 
-# Extraindo dados dos partidos escolhidos: PMDB PSDB PT
+```{r, message=FALSE, include=FALSE}
+# Extraindo dados dos partidos escolhidos: PMDB - PSDB - PT
 dadosPMDB <- dadosCEAP %>% 
   filter(sgPartido == "PMDB")
 
@@ -203,9 +192,6 @@ dadosPT <- dadosCEAP %>%
 ```
 
 ### Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos?
-
-#### Despesas: PMDB
-
 
 ```{r, message=FALSE}
 
@@ -226,9 +212,7 @@ dadosPMDB %>%
 ```
 
 
-#### Despesas: PSDB
-
-```{r}
+```{r, message=FALSE}
 
 dadosPSDB %>% 
   group_by(tipoDespesa) %>% 
@@ -248,9 +232,7 @@ dadosPSDB %>%
 ```
 
 
-#### Despesas: PT
-
-```{r}
+```{r, message=FALSE, warning=FALSE}
 dadosPT %>% 
   group_by(tipoDespesa) %>% 
   summarise(valor_total = sum(valorLíquido)) %>% 
@@ -267,3 +249,6 @@ dadosPT %>%
 
 ```
 
+
+
+Conclusão do lab.

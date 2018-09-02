@@ -14,6 +14,8 @@ output:
 ```{r setup, include=FALSE, warning=FALSE}
 library(tidyverse)
 library(here)
+library(plotly)
+theme_set(theme_light())
 ```
 
 Para iniciarmos nossa análise, o primeiro passo é importar os dados do csv para um dada frame.
@@ -110,7 +112,7 @@ dadosCEAP %>%
                    y = 0,
                    yend = valorTot)) +
   labs(x = "UF",
-       y = "Valor gasto total",
+       y = "Valor gasto (R$)",
        title = "Gastos de cada estado no exterior")
   
 ```
@@ -118,18 +120,23 @@ dadosCEAP %>%
 
 ```{r}
 # Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
+
 dadosCEAP %>% 
   filter(sgUF == "PB") %>% 
   group_by(sgPartido) %>% 
   summarise(valorCEAP = sum(valorLíquido),
             countGastos = n()) %>% 
-  ggplot(aes(x = reorder(sgPartido, -valorCEAP),
-             y = countGastos,
-             fill = valorCEAP)) +
-  geom_col(position = position_identity()) +
-  labs(title = "Quantidade de gastos por partido",
-       x = "Partidos",
-       y = "Quantidade de gastos")
+  plot_ly(x = ~sgPartido,
+          y = ~countGastos,
+          color = ~valorCEAP,
+          type = 'bar',
+          text = ~paste('Sigla do partido: ', sgPartido,
+                        '<br>Quantidade de gastos: ', countGastos,
+                        '<br>Valor gasto CEAP: R$', valorCEAP)) %>% 
+    layout(title = "Partidos que mais usam o CEAP na PB",
+           xaxis = list(title = "Partido"),
+           yaxis = list(title = "Quantidade de gastos"))
+
   
 ```
 
@@ -147,14 +154,51 @@ dadosCEAP %>%
   slice(1:10) %>% 
   na.omit(.) %>% 
   ggplot(aes(x = reorder(nomeParlamentar, -valorTot),
-             y = valorTot,
-             color = "red")) +
+             y = valorTot)) +
   geom_point() +
-  coord_flip()
+  coord_flip() +
+  labs(title = "Top 10 dos deputados que ultrapassaram o limite de CEAP na PB",
+       y = "Valor em R$",
+       x = "Nome do deputado")
 
 ```
 
 ```{r}
+# Quais estados cujos parlamentares gastam mais com passagens aéreas?
+# dúvida: como pegar os dados das passagens aéreas?
+
+dadosCEAP %>% 
+  filter(tipoDespesa == "PASSAGENS AÉREAS") %>% 
+  group_by(sgUF) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>% 
+  na.omit(.) %>% 
+  ggplot(aes(x = reorder(sgUF, -valorTot),
+             y = valorTot,
+             color = sgUF)) +
+  geom_point() +
+  geom_segment(aes(x = reorder(sgUF, -valorTot),
+                   xend = reorder(sgUF, -valorTot),
+                   y = 0,
+                   yend = valorTot)) +
+  coord_flip() +
+  labs(x = "UF",
+       y = "Valor gasto (R$)",
+       title = "Gasto de passagens aéreas por estado com parlamentares")
+  
+  
+
+
+```
+
+
+
+```{r}
+# Escolha três partidos e responda: Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos? Mesma pergunta considerando valores em R$.
+
+# PMDB PSDB PT
+
+
+
 
 ```
 

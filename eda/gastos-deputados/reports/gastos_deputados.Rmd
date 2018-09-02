@@ -11,40 +11,41 @@ output:
     toc: yes
     toc_float: yes
 ---
-```{r setup, include=FALSE, warning=FALSE}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(here)
 library(plotly)
-theme_set(theme_light())
+theme_set(theme_minimal())
 ```
 
-Para iniciarmos nossa análise, o primeiro passo é importar os dados do csv para um dada frame.
+Introdução: o que é o checkpoint e que dados iremos trabalhar.
 
-```{r, message=FALSE}
+Para iniciarmos nossa análise, o primeiro passo é importar nossos dados.
+
+```{r, message=FALSE, warning=FALSE}
 dadosCEAP = read_csv(here("data/dadosCEAP.csv"))
 limiteCEAP = read_csv(here("data/limiteMensalCEAP.csv"))
 ```
 
-Dados fornecidos:
+  Dados fornecidos:
+  
+  - nomeParlamentar: Nome adotado pelo Parlamentar ao tomar posse do seu mandato.
+  - idCadastro: Número que identifica unicamente um deputado federal na CD.
+  - sgUF: No contexto da cota CEAP, representa a unidade da federação pela qual o deputado foi eleito e é utilizada para definir o valor da cota a que o deputado tem.
+  - sgPartido: Sigla do partido do parlamentar.
+  - tipoDespesa: O seu conteúdo é a descrição do Tipo de Despesa relativo à despesa em questão.
+  - especDespesa: Representa a descrição  especificação mais detalhada de um referido Tipo de Despesa.
+  - fornecedor: O conteúdo deste dado representa o nome do fornecedor do produto ou serviço presente no documento fiscal
+  - CNPJCPF: O conteúdo deste dado representa o CNPJ ou o CPF do emitente do documento fiscal, quando se tratar do uso da cota em razão do reembolso despesas comprovadas pela emissão de documentos fiscais.
+  - tipoDocumento: Este dado representa o tipo de documento do fiscal – 0 (Zero), para Nota Fiscal; 1 (um), para Recibo; e 2, para Despesa no Exterior.
+  - dataEmissao: O conteúdo deste dado é a data de emissão do documento fiscal ou a data do documento que tenha dado causa à despesa.
+  - valorDocumento: O seu conteúdo é o valor de face do documento fiscal ou o valor do documento que deu causa à despesa. Quando se tratar de bilhete aéreo, esse valor poderá ser negativo, significando que o referido bilhete é um bilhete de compensação, pois compensa um outro bilhete emitido e não utilizado pelo deputado (idem para o dado vlrLiquido abaixo).
+  - valorGlosa: O seu conteúdo representa o valor da glosa do documento fiscal que incidirá sobre o Valor do Documento, ou o valor da glosa do documento que deu causa à despesa.
+  - valorLiquido: O seu conteúdo representa o valor líquido do documento fiscal ou do documento que deu causa à despesa e será calculado pela diferença entre o Valor do Documento e o Valor da Glosa. É este valor que será debitado da cota do deputado. Caso o débito seja do Tipo Telefonia e o valor seja igual a zero, significa que a despesa foi franqueada.
 
-- nomeParlamentar: Nome adotado pelo Parlamentar ao tomar posse do seu mandato.
-- idCadastro: Número que identifica unicamente um deputado federal na CD.
-- sgUF: No contexto da cota CEAP, representa a unidade da federação pela qual o deputado foi eleito e é utilizada para definir o valor da cota a que o deputado tem.
-- sgPartido: Sigla do partido do parlamentar.
-- tipoDespesa: O seu conteúdo é a descrição do Tipo de Despesa relativo à despesa em questão.
-- especDespesa: Representa a descrição  especificação mais detalhada de um referido Tipo de Despesa.
-- fornecedor: O conteúdo deste dado representa o nome do fornecedor do produto ou serviço presente no documento fiscal
-- CNPJCPF: O conteúdo deste dado representa o CNPJ ou o CPF do emitente do documento fiscal, quando se tratar do uso da cota em razão do reembolso despesas comprovadas pela emissão de documentos fiscais.
-- tipoDocumento: Este dado representa o tipo de documento do fiscal – 0 (Zero), para Nota Fiscal; 1 (um), para Recibo; e 2, para Despesa no Exterior.
-- dataEmissao: O conteúdo deste dado é a data de emissão do documento fiscal ou a data do documento que tenha dado causa à despesa.
-- valorDocumento: O seu conteúdo é o valor de face do documento fiscal ou o valor do documento que deu causa à despesa. Quando se tratar de bilhete aéreo, esse valor poderá ser negativo, significando que o referido bilhete é um bilhete de compensação, pois compensa um outro bilhete emitido e não utilizado pelo deputado (idem para o dado vlrLiquido abaixo).
-- valorGlosa: O seu conteúdo representa o valor da glosa do documento fiscal que incidirá sobre o Valor do Documento, ou o valor da glosa do documento que deu causa à despesa.
-- valorLiquido: O seu conteúdo representa o valor líquido do documento fiscal ou do documento que deu causa à despesa e será calculado pela diferença entre o Valor do Documento e o Valor da Glosa. É este valor que será debitado da cota do deputado. Caso o débito seja do Tipo Telefonia e o valor seja igual a zero, significa que a despesa foi franqueada.
-
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, include=FALSE}
 dadosCEAP$valorGlosa <- as.numeric(sub(",", ".", dadosCEAP$valorGlosa, fixed = TRUE)) 
 ```
-
 
 Perguntas:
 
@@ -55,8 +56,9 @@ Perguntas:
 5. Quais estados cujos parlamentares gastam mais com passagens aéreas? 
 6. Escolha três partidos e responda: Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos? Mesma pergunta considerando valores em R$.
 
-```{r}
-# 1a)
+### Quais os deputados que mais gastaram dinheiro da CEAP?
+
+```{r, message=FALSE}
 dadosCEAP %>% 
   group_by(nomeParlamentar) %>% 
   summarise(valorTot = sum(valorLíquido)) %>%
@@ -74,9 +76,9 @@ dadosCEAP %>%
   coord_flip()
 ```
 
-
-```{r}
-# 1b)
+#### Quais os mais ecoômicos?
+```{r, message=FALSE}
+# 1b) Quais são os mais econômicos? 
 dadosCEAP %>% 
   group_by(nomeParlamentar) %>% 
   summarise(valorTot = sum(valorLíquido)) %>%
@@ -90,13 +92,14 @@ dadosCEAP %>%
   geom_col(position = position_identity()) +
   labs(y = "Valor gasto total",
        x = "Nome do candidato",
-       title = "Top 10 dos candidatos menos gastosos") +
+       title = "Top 10 dos candidatos mais econômicos") +
   coord_flip()
 ```
 
 
-```{r}
-# 2
+### Quais os estados cujos deputados gastam mais e menos no exterior?
+
+```{r, message=FALSE}
 dadosCEAP %>% 
   filter(tipoDocumento == 2) %>% 
   group_by(sgUF) %>% 
@@ -117,10 +120,10 @@ dadosCEAP %>%
   
 ```
 
+### Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? E os que menos usam?
 
-```{r}
-# Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? Quais são os que menos usam? Mesmas perguntas considerando valores em R$. 
 
+```{r, message=FALSE}
 dadosCEAP %>% 
   filter(sgUF == "PB") %>% 
   group_by(sgPartido) %>% 
@@ -140,9 +143,9 @@ dadosCEAP %>%
   
 ```
 
+### Quais os deputados que mais ultrapassam o limite de CEAP do seu estado? 
 
-```{r}
-# Quais os deputados que mais ultrapassam o limite de CEAP do seu estado? 
+```{r, message=FALSE}
 limitePB <- limiteCEAP %>% 
   filter(UF == "PB")
 
@@ -163,10 +166,9 @@ dadosCEAP %>%
 
 ```
 
-```{r}
-# Quais estados cujos parlamentares gastam mais com passagens aéreas?
-# dúvida: como pegar os dados das passagens aéreas?
+### Quais estados cujos parlamentares gastam mais com passagens aéreas?
 
+```{r, message=FALSE}
 dadosCEAP %>% 
   filter(tipoDespesa == "PASSAGENS AÉREAS") %>% 
   group_by(sgUF) %>% 
@@ -184,22 +186,84 @@ dadosCEAP %>%
   labs(x = "UF",
        y = "Valor gasto (R$)",
        title = "Gasto de passagens aéreas por estado com parlamentares")
-  
-  
 
+```
+
+```{r, message=FALSE}
+# Escolha três partidos e responda: 
+# Extraindo dados dos partidos escolhidos: PMDB PSDB PT
+dadosPMDB <- dadosCEAP %>% 
+  filter(sgPartido == "PMDB")
+
+dadosPSDB <- dadosCEAP %>% 
+  filter(sgPartido == "PSDB")
+
+dadosPT <- dadosCEAP %>% 
+  filter(sgPartido == "PT")
+```
+
+### Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos?
+
+#### Despesas: PMDB
+
+
+```{r, message=FALSE}
+
+dadosPMDB %>% 
+  group_by(tipoDespesa) %>% 
+  summarise(valor_total = sum(valorLíquido)) %>% 
+  na.omit(.) %>% 
+  plot_ly(x = ~valor_total,
+          y = ~tipoDespesa,
+          type = 'bar',
+          color = ~valor_total,
+          text = ~paste('Valor total: R$', valor_total,
+                        '<br>Tipo de despesa: ', tipoDespesa)) %>% 
+  layout(title = "Tipos de despesas: PMDB",
+           xaxis = list(title = "Valor total (R$)"),
+           yaxis = list(title = "Tipo de despesa"))
 
 ```
 
 
+#### Despesas: PSDB
 
 ```{r}
-# Escolha três partidos e responda: Quais são os tipos de despesa mais utilizados no uso da CEAP pelos deputados desses partidos? Mesma pergunta considerando valores em R$.
 
-# PMDB PSDB PT
-
-
+dadosPSDB %>% 
+  group_by(tipoDespesa) %>% 
+  summarise(valor_total = sum(valorLíquido)) %>% 
+  na.omit(.) %>% 
+  plot_ly(x = ~valor_total,
+          y = ~tipoDespesa,
+          type = 'bar',
+          color = ~valor_total,
+          text = ~paste('Valor total: R$', valor_total,
+                        '<br>Tipo de despesa: ', tipoDespesa)) %>% 
+  layout(title = "Tipos de despesas: PSDB",
+           xaxis = list(title = "Valor total (R$)"),
+           yaxis = list(title = "Tipo de despesa"))
 
 
 ```
 
+
+#### Despesas: PT
+
+```{r}
+dadosPT %>% 
+  group_by(tipoDespesa) %>% 
+  summarise(valor_total = sum(valorLíquido)) %>% 
+  na.omit(.) %>% 
+  plot_ly(x = ~valor_total,
+          y = ~tipoDespesa,
+          type = 'bar',
+          color = ~valor_total,
+          text = ~paste('Valor total: R$', valor_total,
+                        '<br>Tipo de despesa: ', tipoDespesa)) %>% 
+  layout(title = "Tipos de despesas: PT",
+           xaxis = list(title = "Valor total (R$)"),
+           yaxis = list(title = "Tipo de despesa"))
+
+```
 

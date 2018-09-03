@@ -18,7 +18,9 @@ library(plotly)
 theme_set(theme_minimal())
 ```
 
-Introdução: o que é o checkpoint e que dados iremos trabalhar.
+Estamos em período de decisões eleitorais importantes e com isso, é interessante observar alguns dados e atitudes de nossos representantes. Dessa maneira, nas análises a seguir iremos trabalhar em cima dos dados da CEAP com o objetivo de verificar como nossos parlamentares estão gastando o dinheiro público fornecido.
+
+Obs.: os parlamentares que serão analisados são os deputados.
 
 Para iniciarmos nossa análise, o primeiro passo é importar nossos dados.
 
@@ -47,6 +49,8 @@ Dados fornecidos:
 dadosCEAP$valorGlosa <- as.numeric(sub(",", ".", dadosCEAP$valorGlosa, fixed = TRUE)) 
 ```
 
+Então iremos iniciar com os questionamentos:
+
 ### Quais os deputados que mais gastaram dinheiro da CEAP?
 
 ```{r, message=FALSE}
@@ -61,11 +65,26 @@ dadosCEAP %>%
              y = valorTot,
              fill = valorTot)) +
   geom_col(position = position_identity()) +
-  labs(y = "Valor gasto total",
+  labs(y = "Valor gasto total (R$)",
        x = "Nome do candidato",
        title = "Top 10 dos candidatos mais gastosos") +
   coord_flip()
 ```
+
+```{r}
+dadosCEAP %>% 
+  mutate(`Nome do parlamentar` = nomeParlamentar,
+         `Sigla do estado` = sgUF,
+         `Sigla do partido` = sgPartido) %>% 
+  filter(`Nome do parlamentar` %in% c("EDIO LOPES",
+                                "HIRAN GONÇALVES",
+                                "JHONATAN DE JESUS")) %>% 
+  group_by(`Nome do parlamentar`, 
+           `Sigla do estado`, 
+           `Sigla do partido`) %>% 
+  summarise(`Valor total` = sum(valorLíquido))
+```
+
 
 ### Quais os mais ecoômicos?
 ```{r, message=FALSE}
@@ -86,6 +105,22 @@ dadosCEAP %>%
   coord_flip()
 ```
 
+```{r}
+dadosCEAP %>% 
+  mutate(`Nome do parlamentar` = nomeParlamentar,
+         `Sigla do estado` = sgUF,
+         `Sigla do partido` = sgPartido) %>% 
+  filter(`Nome do parlamentar` %in% c("CAMILO COLA",
+                                "MARCIO MONTEIRO",
+                                "MARCELO ALMEIDA")) %>% 
+  group_by(`Nome do parlamentar`, 
+           `Sigla do estado`, 
+           `Sigla do partido`) %>% 
+  summarise(`Valor total` = sum(valorLíquido))
+```
+
+Com os gráficos e tabelas acima, podemos observar que os candidatos que mais gastam dinheiro da CEAP foram Edio Lopes, Hiran Gonçalves e Jhonatan de Jesus, com gastos de 1485079, 1430398 e 1428402 respectivamente. E um fato curioso, é que os 3 mais gastosos são do estado de Roraima, no entanto pertencem a partidos distintos.
+Já os candidatos que menos gastam são Camilo Cola, Marcelo Almeida e Marcio Monteiro, com gastos de 0.62, 26.16 e 14.18, respectivamente. Ambos pertecentes a regiões brasileiras diferentes e aos partidos PMDB e PSDB, que por sinal são partidos de grande influência em nosso cenário político.
 
 ### Quais os estados cujos deputados gastam mais e menos no exterior?
 
@@ -109,6 +144,8 @@ dadosCEAP %>%
        title = "Gastos de cada estado no exterior")
   
 ```
+
+Para esse questionamento, podemos ver que estados cujo deputados mais gastam verba no exterior são São Paulo, Minas Gerais e Pernambuco ultrapassando o valor de 100000. Acredito que um aspecto forte para esses estados se destacarem, seja pelo fato de terem muitos deputados, quem quiser olhar a quantidade de cada parlamentar em seu estado [link: camara dos deputados](http://www2.camara.leg.br/a-camara/conheca/quantos-sao-e-de-que-forma-e-definido-o-numero-de-deputados). Por outro lado, Pará,Paraíba e Maranhão são os que mais poupam com despesas no exterior.
 
 ### Quais os partidos cujos parlamentares mais usam CEAP no estado da Paraíba? E os que menos usam?
 

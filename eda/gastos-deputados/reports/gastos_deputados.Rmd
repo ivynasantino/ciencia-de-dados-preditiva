@@ -136,23 +136,31 @@ dadosCEAP %>%
 ### Quais os deputados que mais ultrapassam o limite de CEAP do seu estado? 
 
 ```{r, message=FALSE}
-limitePB <- limiteCEAP %>% 
-  filter(UF == "PB")
+limiteCEAP <- limiteCEAP %>% 
+  select(sgUF = UF,
+         limite_mensal = limite_mensal)
 
-dadosCEAP %>% 
-  filter(sgUF == "PB") %>% 
+dados_limite = left_join(dadosCEAP, limiteCEAP)
+
+dados_limite %>% 
   group_by(nomeParlamentar) %>% 
-  summarise(valorTot = sum(valorLíquido)) %>% 
-  filter(valorTot > limitePB$limite_mensal) %>% 
+  filter(valorLíquido > limite_mensal) %>% 
+  select(nomeParlamentar, 
+         sgUF) %>%
+  summarise(count = n()) %>% 
+  unique() %>% 
+  ungroup() %>% 
+  arrange(-count) %>% 
   slice(1:10) %>% 
-  na.omit(.) %>% 
-  ggplot(aes(x = reorder(nomeParlamentar, -valorTot),
-             y = valorTot)) +
-  geom_point() +
-  coord_flip() +
-  labs(title = "Top 10 dos deputados que ultrapassaram o limite de CEAP na PB",
-       y = "Valor em (R$)",
-       x = "Nome do deputado")
+  plot_ly(y = ~nomeParlamentar,
+          x = ~count,
+          color = ~count,
+          type = 'bar',
+          text = ~paste('Nome do parlamentar: ', nomeParlamentar,
+                        '<br>Qnt de vezes que ultrapassa: ', count)) %>% 
+  layout(title = "Top 10 dos deputados que ultrapassaram o limite de CEAP",
+         yaxis = list(title = "Nome do deputado"),
+         xaxis = list(title = "Valor em (R$)"))
 
 ```
 

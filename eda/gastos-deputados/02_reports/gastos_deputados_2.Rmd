@@ -1,8 +1,15 @@
 ---
-title: "Análise de gastos dos parlamentares 2""
+title: "Análise de gastos de parlamentares - parte 2"
 author: "Ivyna Santino"
-date: "4 de setembro de 2018"
-output: html_document
+date: "07 de setembro de 2018"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, warning=FALSE, message=FALSE, include=FALSE}
@@ -11,11 +18,27 @@ library(here)
 theme_set(theme_minimal())
 ```
 
+Explicar que é uma continuação de outro lab
+
+Importando dados:
 ```{r, message=FALSE, warning=FALSE}
 dadosCEAP = read_csv(here("data/dadosCEAP.csv"))
 ```
 
+Breve descrição dos dados
+
 Perguntas:
 
-1. 
-2.
+1. Com relação aos gastos de cada região, podemos observar se há alguma similaridade ou padrão com tipos de despesas e esses gastos?
+* Sugestões: poderia pegar os top 3-5 de gastos mais frequentes ou os que gastaram mais dinheiro
+* Separar por regiões
+* Plot: Boxplot + pontos --> x = regiões brasileiras, y = valor (R$) e pontos: tipo de despesa(separadas por cores e legenda com nome+valor+região)
+* Explicação dos dados
+
+2. Com os dados da CEAP podemos ver a data de emissão do respectivo documento. Dessa forma, há gastos registrados em feriados nacionais?
+* Extrair datas: 01-01(Meu aniversário :D), 25-12(Natal), 07-09(Independência), 12-10(Padroeira), 15-10(Proclamação da república)
+* 
+
+
+
+

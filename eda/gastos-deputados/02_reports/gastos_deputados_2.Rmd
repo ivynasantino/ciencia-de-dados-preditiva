@@ -1,0 +1,21 @@
+---
+title: "Análise de gastos dos parlamentares 2""
+author: "Ivyna Santino"
+date: "4 de setembro de 2018"
+output: html_document
+---
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+library(tidyverse)
+library(here)
+theme_set(theme_minimal())
+```
+
+```{r, message=FALSE, warning=FALSE}
+dadosCEAP = read_csv(here("data/dadosCEAP.csv"))
+```
+
+Perguntas:
+
+1. 
+2.

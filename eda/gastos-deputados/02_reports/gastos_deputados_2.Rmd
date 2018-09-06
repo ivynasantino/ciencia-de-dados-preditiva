@@ -15,6 +15,7 @@ output:
 ```{r setup, warning=FALSE, message=FALSE, include=FALSE}
 library(tidyverse)
 library(here)
+library(lubridate)
 theme_set(theme_minimal())
 ```
 
@@ -35,10 +36,66 @@ Perguntas:
 * Plot: Boxplot + pontos --> x = regiões brasileiras, y = valor (R$) e pontos: tipo de despesa(separadas por cores e legenda com nome+valor+região)
 * Explicação dos dados
 
-2. Com os dados da CEAP podemos ver a data de emissão do respectivo documento. Dessa forma, há gastos registrados em feriados nacionais?
-* Extrair datas: 01-01(Meu aniversário :D), 25-12(Natal), 07-09(Independência), 12-10(Padroeira), 15-10(Proclamação da república)
-* 
+2. Com os dados da CEAP podemos ver a data de emissão do respectivo documento. Dessa forma, há gastos registrados em feriados nacionais e finais de semana?
+* Extrair datas: 01-01(Meu aniversário :D), 25-12(Natal), 07-09(Independência), 12-10(Padroeira), 15-11(Proclamação da república)
+* Ordenar datas de forma crescente
+* Plot: utilizar o animations do plotly
+* Coordenadas: x = valor, y = datas, pontos, cor: tipo de despesa
+* Existe dados de 2014 a 2017
+
+Separando os estados brasileiros em suas respectivas regiões:
+
+```{r}
+dadosCEAP <- dadosCEAP %>% 
+  mutate(
+    regiao = case_when(
+      sgUF %in% c("RJ", "SP", "ES", "MG") ~ "Sudeste",
+      sgUF %in% c("PB", "RN", "SE", "BA", "MA", "PE", "AL", "CE", "PI") ~ "Nordeste",
+      sgUF %in% c("GO", "MT", "MS", "DF") ~ "Centro-Oeste",
+      sgUF %in% c("RS", "PR", "SC") ~ "Sul",
+      sgUF %in% c("PA", "AC", "AM", "RO", "RR", "AP", "TO") ~ "Norte"
+    )
+  )
+  
+```
+
+
+```{r}
+dadosCEAP <- dadosCEAP %>% 
+  mutate(
+    dia = day(dataEmissao),
+    mes = month(dataEmissao),
+    ano = year(dataEmissao))
+
+dadosCEAP <- dadosCEAP %>% 
+  mutate(data = paste(ano, mes, dia, sep='-') %>% 
+           as.Date(.))
+
+dadosCEAP$diaSemana <- weekdays(as.Date(dadosCEAP$data))
+
+dadosCEAP <- dadosCEAP %>%
+  mutate(fds = ifelse(diaSemana %in% c("sábado","domingo"),TRUE,FALSE))
+
+dadosCEAP <- dadosCEAP %>% 
+  mutate(feriado = ifelse(data %in% c("2015-01-01", "2016-01-01", "2017-01-01",
+                                      "2015-09-07", "2016-09-07", "2017-09-07",
+                                      "2014-12-25", "2015-12-25", "2016-12-25"), FALSE, TRUE))
+
+
+```
+
+
+```{r}
+dadosCEAP %>% 
+  filter(feriado == TRUE) %>%
+  group_by(nomeParlamentar) %>% 
+  summarise(c = n())
+```
 
 
 
+
+Depois da separação dos estados em regiões(Norte, Nordeste, Sul, Sudeste e Centro Oeste) e da extração das datas do horário de emissão, vamos as perguntas:
+
+### Com relação aos gastos de cada região, podemos observar se há alguma similaridade ou padrão com tipos de despesas e esses gastos?
 

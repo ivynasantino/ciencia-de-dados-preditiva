@@ -15,6 +15,7 @@ output:
 ```{r setup, warning=FALSE, message=FALSE, include=FALSE}
 library(tidyverse)
 library(lubridate)
+library(plotly)
 theme_set(theme_minimal())
 ```
 
@@ -23,23 +24,13 @@ Explicar que é uma continuação de outro lab
 Importando dados:
 ```{r, message=FALSE, warning=FALSE}
 dadosCEAP = read_csv(("../data/dadosCEAP.csv"))
-
 ```
 
 Breve descrição dos dados
 
-Perguntas:
+Separando os estados brasileiros em suas respectivas regiões
 
-2. Com os dados da CEAP podemos ver a data de emissão do respectivo documento. Dessa forma, há gastos registrados em finais de semana?
-* Extrair datas: 01-01(Meu aniversário :D), 25-12(Natal), 07-09(Independência), 12-10(Padroeira), 15-11(Proclamação da república)
-* Ordenar datas de forma crescente
-* Plot: utilizar o animations do plotly
-* Coordenadas: x = valor, y = datas, pontos, cor: tipo de despesa
-* Existe dados de 2014 a 2017
-
-Separando os estados brasileiros em suas respectivas regiões:
-
-```{r}
+```{r, message=FALSE, warning=FALSE}
 dadosCEAP <- dadosCEAP %>% 
   mutate(
     regiao = case_when(
@@ -54,7 +45,7 @@ dadosCEAP <- dadosCEAP %>%
 ```
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 dadosCEAP <- dadosCEAP %>% 
   mutate(
     dia = day(dataEmissao),
@@ -72,42 +63,34 @@ dadosCEAP <- dadosCEAP %>%
 
 ```
 
-
-```{r}
-dadosCEAP <- dadosCEAP %>% 
-  mutate(feriado = ifelse(data %in% c("2015-01-01", "2016-01-01", "2017-01-01",
-                                      "2015-09-07", "2016-09-07", "2017-09-07",
-                                      "2014-12-25", "2015-12-25", "2016-12-25"), TRUE, FALSE))
-
-
-dadosCEAP <- dadosCEAP %>% 
-  mutate(feriado = ifelse(data %in% c("2015-01-01", "2016-01-01", "2017-01-01"), TRUE, FALSE))
-
-
-```
-
-1. Com relação aos gastos de cada região, podemos observar se há alguma similaridade ou padrão com tipos de despesas e esses gastos?
-* Sugestões: poderia pegar os top 3-5 de gastos mais frequentes ou os que gastaram mais dinheiro
-* Separar por regiões
-* Plot: Boxplot + pontos --> x = regiões brasileiras, y = valor (R$) e pontos: tipo de despesa(separadas por cores e legenda com nome+valor+região)
-* Explicação dos dados
-
-```{r}
-dadosCEAP %>% 
-  group_by(nomeParlamentar,
-           regiao) %>% 
-  summarise(valorTot = sum(valorLíquido)) %>% 
-  ggplot(aes(y = valorTot,
-             x = regiao)) +
-  geom_boxplot(width = .5) +
-  geom_jitter(width = .3, alpha = .5)
-
-```
-
-
-
-
 Depois da separação dos estados em regiões(Norte, Nordeste, Sul, Sudeste e Centro Oeste) e da extração das datas do horário de emissão, vamos as perguntas:
 
 ### Com relação aos gastos de cada região, podemos observar se há alguma similaridade ou padrão com tipos de despesas e esses gastos?
 
+
+```{r, warning=FALSE, message=FALSE}
+dadosCEAP %>% 
+  group_by(tipoDespesa,
+           regiao) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>% 
+  ggplot(aes(y = valorTot,
+             x = regiao,
+             fill = tipoDespesa)) +
+  geom_col(position = position_identity()) 
+  
+```
+
+### Com os dados da CEAP podemos ver a data de emissão do respectivo documento. Dessa forma, quanto e como gastam os partidos em finais de semana?
+
+```{r, warning=FALSE, message=FALSE}
+dadosCEAP %>%
+  filter(fds == TRUE) %>% 
+  group_by(tipoDespesa,
+           sgPartido) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>% 
+  arrange(-valorTot) %>%
+  plot_ly(x = ~valorTot,
+          y = ~tipoDespesa,
+          color = ~sgPartido,
+          type = 'scatter')
+```

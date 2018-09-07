@@ -19,16 +19,16 @@ library(plotly)
 theme_set(theme_minimal())
 ```
 
-Explicar que é uma continuação de outro lab
+A princípio esse markdown é uma continuação desse aqui: [Análise de gastos dos parlamentares](), que demostra algumas análises descritivas dos dados da CEAP. Dessa forma, o objetivo da parte 2 é trazer novos questionamentos desses dados e analisá-los descritivamente.
 
-Importando dados:
+Importando os dados:
 ```{r, message=FALSE, warning=FALSE}
 dadosCEAP = read_csv(("../data/dadosCEAP.csv"))
 ```
 
-Breve descrição dos dados
+Antes de começar com perguntas, iremos preparar os dados para o que iremos precisar:
 
-Separando os estados brasileiros em suas respectivas regiões
+1. Separar os estados brasileiros em suas respectivas regiões
 
 ```{r, message=FALSE, warning=FALSE}
 dadosCEAP <- dadosCEAP %>% 
@@ -44,6 +44,7 @@ dadosCEAP <- dadosCEAP %>%
   
 ```
 
+2. Extrair só a data do parâmentro data de emissão e verificar os finais de semana:
 
 ```{r, message=FALSE, warning=FALSE}
 dadosCEAP <- dadosCEAP %>% 
@@ -67,7 +68,6 @@ Depois da separação dos estados em regiões(Norte, Nordeste, Sul, Sudeste e Ce
 
 ### Com relação aos gastos de cada região, podemos observar se há alguma similaridade ou padrão com tipos de despesas e esses gastos?
 
-
 ```{r, warning=FALSE, message=FALSE}
 dadosCEAP %>% 
   group_by(tipoDespesa,
@@ -79,6 +79,17 @@ dadosCEAP %>%
   geom_col(position = position_identity()) 
   
 ```
+
+Como podemos observar no gráfico acima, os tipos de despesas que mais se fazem presente nos finais de semana são:
+
+- Fornecimento de alimentação do parlamentar;
+- Divulgação de atividade do parlamentar;
+- Manutenção de escritório de apoio à atividade parlamentar;
+- Telefonia.
+
+Ao elencar os tópicos acima, podemos ver que regiões como Sul e Sudeste tiveram comportamentos semelhantes com os tipos de despesa, ao gastar com fornecimento de alimentação, manutenção de escritório e telefonia. Já as demais regiões, Norte, Nordeste e Centro Oeste tiveram como top 3 com divulgação de atividade parlamentar, fornecimento de alimentação e serviços de telefonia.
+
+É válido ressaltar, assim como foi feito no markdown parte 1, que a proporção de parlamentares de cada região do Brasil é diferente, por exemplo, a região Sudeste tem a maior concentração de parlamentares e com isso, consequentemente, os gastos naturalmente tendem a serem maiores.
 
 ### Com os dados da CEAP podemos ver a data de emissão do respectivo documento. Dessa forma, quanto e como gastam os partidos em finais de semana?
 

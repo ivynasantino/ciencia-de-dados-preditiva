@@ -19,7 +19,7 @@ library(plotly)
 theme_set(theme_minimal())
 ```
 
-A princípio esse markdown é uma continuação desse aqui: [Análise de gastos dos parlamentares](), que demostra algumas análises descritivas dos dados da CEAP. Dessa forma, o objetivo da parte 2 é trazer novos questionamentos desses dados e analisá-los descritivamente.
+A princípio esse markdown é uma continuação desse aqui: [Análise de gastos dos parlamentares](http://rpubs.com/ivynasantino/gastosparlamentares), que demostra algumas análises descritivas dos dados da CEAP. Dessa forma, o objetivo da parte 2 é trazer novos questionamentos desses dados e analisá-los descritivamente.
 
 Importando os dados:
 ```{r, message=FALSE, warning=FALSE}
@@ -76,11 +76,14 @@ dadosCEAP %>%
   ggplot(aes(y = valorTot,
              x = regiao,
              fill = tipoDespesa)) +
-  geom_col(position = position_identity()) 
+  geom_col(position = position_identity()) +
+  labs(x = "Região brasileira",
+       y = "Total gasto (R$)") +
+  coord_flip()
   
 ```
 
-Como podemos observar no gráfico acima, os tipos de despesas que mais se fazem presente nos finais de semana são:
+Como podemos observar no gráfico acima, os tipos de despesas de cada região do Brasil:
 
 - Fornecimento de alimentação do parlamentar;
 - Divulgação de atividade do parlamentar;
@@ -103,5 +106,62 @@ dadosCEAP %>%
   plot_ly(x = ~valorTot,
           y = ~tipoDespesa,
           color = ~sgPartido,
-          type = 'scatter')
+          type = 'scatter',
+          text = ~paste('Total gasto (R$): ', valorTot,
+                        '<br>Tipo de despesa: ', tipoDespesa,
+                        '<br>Partido: ', sgPartido)) %>% 
+  layout(title = "Tipos de gastos da CEAP de cada partido",
+         xaxis = list(title = "Total gasto (R$)"),
+         yaxis = list(title = "Tipo de despesa"))
 ```
+
+A visualização acima, podemos observar que os maiores gastos dos finais de semana foram com:
+
+- Combustível: R$ 1.017.093,51;
+- Manutenção de escritório de apoio à atividade parlamentar: R$ 880.633,47;
+- Telefonia: R$ 754.069,51.
+
+Os valores acima foram retirados dos 3 maiores gastos, mas fato curioso é que o PT é o partido que lidera nas 3 categorias. Além disso, podemos ver também que na maioria dos tipos de despesas os partidos que mais gastam são PT, PP, PSDB, PMDB.
+
+#### E ao observar os dados dos finais de semana, que por sinal são valores altos, que tal observar os dados último Natal e reveillon ?
+
+Obs.: Em nossa base de dados o úlitmo Natal registrado foi de 2016 e Reveillon de 2017.
+
+```{r, message=FALSE, warning=FALSE}
+dadosCEAP %>% 
+  filter(data == "2016-12-25") %>% 
+  group_by(nomeParlamentar,
+           tipoDespesa) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>% 
+  arrange(-valorTot) %>% 
+  ungroup() %>% 
+  slice(1:10)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+dadosCEAP %>% 
+  filter(data == "2017-01-01") %>% 
+  group_by(nomeParlamentar,
+           tipoDespesa) %>% 
+  summarise(valorTot = sum(valorLíquido)) %>% 
+  arrange(-valorTot) %>% 
+  ungroup() %>% 
+  slice(1:10) %>% 
+  ggplot(aes(x = reorder(nomeParlamentar, -valorTot),
+             y = valorTot,
+             color = tipoDespesa)) +
+  geom_point() +
+  geom_segment(aes(x = reorder(nomeParlamentar, -valorTot),
+                   xend = reorder(nomeParlamentar, -valorTot),
+                   y = 0,
+                   yend = valorTot)) +
+  coord_flip() +
+  labs(title = "Top 10 dos parlamentares que gastaram no Reveillon de 2017",
+       x = "Nome do parlamentar",
+       y = "Total gasto (R$)")
+  
+```
+
+É interessante observar que em datas que teoricamente não possuem atividades trabalhistas, pois são feriados, há registros de emissão de notas fiscais. Elenquei os 10 parlamentares que tiveram a maior soma de gastos e é legal observar que os tipos de despesas são bem atípicas, como locação ou freteamento de veículos automotores, divulgação de atividade parlamentar, serviço de táxi/pedágio ou estacionamento e manutenção de escritório. Agora fica o questionamento, será que esse dinheiro foi gasto corretamente ou podemos dar o selo de turistas, panfleteiro, telefonista ou de vou de táxi? Quem quiser saber dos canditados e seus respectivos gastos e selos que ganham, acessem o [vidinha de balada](http://vidinhadebalada.com/).
+

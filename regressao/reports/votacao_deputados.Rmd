@@ -1,0 +1,11 @@
+---
+title: "Usando Regressão Linear para Explicar a votação de Deputados"
+author: "Ivyna Santino"
+date: "26 de setembro de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+```
+

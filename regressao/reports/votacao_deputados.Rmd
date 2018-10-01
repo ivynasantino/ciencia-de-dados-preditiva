@@ -19,12 +19,6 @@ eleicao_2006_2010 = read_csv(here("data/eleicoes_2006_e_2010.csv"))
 ```
 
 Perguntas:
-1.Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010. 
-2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
-  Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
-  Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
-  Compare os valores de R2 e RSE considerando as regressões para cada ano.
-  Inclua outros pontos de comparação que você ache interessante.
 3.Todas as variáveis são úteis para os modelos de regressão? Há variáveis redudantes? Faça análises para 2006 e 2010 separadamente. 
 4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
 5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
@@ -34,8 +28,8 @@ names(eleicao_2006)
 ```
 
 
-
-```{r}
+### Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
+```{r, message=FALSE, warning=FALSE}
 # 2006
 correlacao <- eleicao_2006 %>% 
   select(qtd_doacoes = quantidade_doacoes,
@@ -64,7 +58,7 @@ corrplot(correlacao, type = "upper",
 
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 # 2010
 correlacao <- eleicao_2010 %>% 
   select(qtd_doacoes = quantidade_doacoes,
@@ -92,6 +86,13 @@ corrplot(correlacao, type = "upper",
          col = brewer.pal(n = 8, name = "RdYlBu"))
 ```
 
+### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
+  Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
+  Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
+  Compare os valores de R2 e RSE considerando as regressões para cada ano.
+  Inclua outros pontos de comparação que você ache interessante.
 
+```{r}
 
+```
 

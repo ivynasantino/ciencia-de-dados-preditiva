@@ -95,6 +95,51 @@ corrplot(correlacao, type = "upper",
   Inclua outros pontos de comparação que você ache interessante.
 
 ```{r}
-#gather
+eleicao_2006 %>% 
+  select(qtd_doacoes = quantidade_doacoes,
+         qtd_doadores = quantidade_doadores,
+         tot_receita = total_receita,
+         med_receita = media_receita,
+         outros_cand = recursos_de_outros_candidatos.comites,
+         pes_fisica = recursos_de_pessoas_fisicas,
+         pes_juridica = recursos_de_pessoas_juridicas,
+         rec_prop = recursos_proprios,
+         rec_partido = recursos_de_partido_politico,
+         qtd_desp = quantidade_despesas,
+         qtd_fornec = quantidade_fornecedores,
+         tot_desp = total_despesa,
+         med_desp = media_despesa,
+         votos) %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = valor)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x")
+  
+```
+
+
+```{r}
+eleicao_2006 %>% 
+  select(qtd_doacoes = quantidade_doacoes,
+         qtd_doadores = quantidade_doadores,
+         tot_receita = total_receita,
+         med_receita = media_receita,
+         outros_cand = recursos_de_outros_candidatos.comites,
+         pes_fisica = recursos_de_pessoas_fisicas,
+         pes_juridica = recursos_de_pessoas_juridicas,
+         rec_prop = recursos_proprios,
+         rec_partido = recursos_de_partido_politico,
+         qtd_desp = quantidade_despesas,
+         qtd_fornec = quantidade_fornecedores,
+         tot_desp = total_despesa,
+         med_desp = media_despesa,
+         votos) %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = log(valor))) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x")
+  
 ```
 

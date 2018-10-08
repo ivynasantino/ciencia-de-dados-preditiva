@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE, message=FALSE}
 library(tidyverse)
 library(here)
+library(dplyr)
 theme_set(theme_minimal())
 library(corrplot)
 ```
@@ -86,6 +87,7 @@ corrplot(correlacao, type = "upper",
          col = brewer.pal(n = 8, name = "RdYlBu"))
 ```
 
+
 ### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
   Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
   Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
@@ -93,6 +95,6 @@ corrplot(correlacao, type = "upper",
   Inclua outros pontos de comparação que você ache interessante.
 
 ```{r}
-
+#gather
 ```
 

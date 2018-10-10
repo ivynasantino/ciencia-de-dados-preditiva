@@ -321,10 +321,66 @@ qqline(modelo_06$residuals,
 
 ### 5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
 
-```{r, message=FALSE, warning=FALSE}
 
+```{r, message=FALSE, warning=FALSE}
+eleicao_06_10_mod <- eleicao_2006_2010 %>% 
+  select(-cargo,
+         -nome,
+         -sequencial_candidato,
+         -ano)
 ```
 
 
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_06_10 <- lm(votos ~ ., 
+                    data = eleicao_06_10_mod, 
+                    na.action = na.omit)
+```
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_tot_06)
+```
+
+```{r, message=FALSE, warning=FALSE}
+
+correlacao_06_10 <- select_2006_2010 %>% 
+  cor()
+
+corrplot(correlacao_06_10, type = "upper",
+         order = "hclust",
+         number.cex = .6,
+         addCoef.col = "#FF7F50",
+         tl.col = "black", tl.srt = 90,
+         col = brewer.pal(n = 8, name = "PuOr"))
+
+```
+
+votos = tot_desp + qnt_doacoes
+
+```{r, message=FALSE, warning=FALSE}
+c <- eleicao_2006_2010 %>% 
+  select(votos,
+         total_despesa,
+         total_receita,
+         recursos_de_outros_candidatos.comites,
+         recursos_de_pessoas_fisicas,
+         recursos_de_pessoas_juridicas,
+         quantidade_doacoes,
+         )
+```
 
 
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_06_10 <- lm(votos ~ ., 
+                    data = c, 
+                    na.action = na.omit)
+```
+
+```{r}
+print(mean(modelo_tot_06_10$residuals))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_tot_06_10)
+```

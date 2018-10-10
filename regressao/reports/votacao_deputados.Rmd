@@ -1,5 +1,5 @@
 ---
-title: "Usando Regressão Linear para Explicar a votação de Deputados"
+title: "Usando regressão linear para explicar a votação de deputados"
 author: "Ivyna Santino"
 date: "26 de setembro de 2018"
 output: html_document
@@ -24,11 +24,6 @@ eleicao_2006 <- importa_eleicao("eleicoes_2006.csv")
 eleicao_2010 <- importa_eleicao("eleicoes_2010.csv")
 eleicao_2006_2010 <- importa_eleicao("eleicoes_2006_e_2010.csv")
 ```
-
-Perguntas:
-3.Todas as variáveis são úteis para os modelos de regressão? Há variáveis redudantes? Faça análises para 2006 e 2010 separadamente. 
-4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
-5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
 
 ```{r}
 names(eleicao_2006)
@@ -56,11 +51,49 @@ seleciona_variaveis <- function(dataframe) {
 
 select_2006 <- seleciona_variaveis(eleicao_2006)
 select_2010 <- seleciona_variaveis(eleicao_2010)
+select_2006_2010 <- seleciona_variaveis(eleicao_2006_2010)
 
 ```
 
 
 ### Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
+fazer uma regressao multipla com todas as variaveis e ver se é legal
+```{r, message=FALSE, warning=FALSE}
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = valor)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Linear")
+
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = log(valor))) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Log")
+
+```
+
+### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
+  Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
+  Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
+  Compare os valores de R2 e RSE considerando as regressões para cada ano.
+  Inclua outros pontos de comparação que você ache interessante.
+
+```{r, message=FALSE, warning=FALSE}
+
+```
+
+### 3.Todas as variáveis são úteis para os modelos de regressão? Há variáveis redudantes? Faça análises para 2006 e 2010 separadamente. 
+
 ```{r, message=FALSE, warning=FALSE}
 # 2006
 correlacao_06 <- select_2006 %>% 
@@ -89,35 +122,24 @@ corrplot(correlacao_10, type = "upper",
 ```
 
 
-### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
-  Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
-  Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
-  Compare os valores de R2 e RSE considerando as regressões para cada ano.
-  Inclua outros pontos de comparação que você ache interessante.
+### 4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
 
 ```{r, message=FALSE, warning=FALSE}
-select_2006 %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = valor)) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Linear")
-
-select_2006 %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = log(valor))) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Log")
-
-
-  
+#2006
 ```
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
+#2010
+```
+
+
+### 5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
+
+```{r, message=FALSE, warning=FALSE}
 
 ```
+
+
+
 

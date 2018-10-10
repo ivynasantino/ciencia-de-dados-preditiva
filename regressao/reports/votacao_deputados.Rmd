@@ -384,3 +384,23 @@ print(mean(modelo_tot_06_10$residuals))
 ```{r, message=FALSE, warning=FALSE}
 summary(modelo_tot_06_10)
 ```
+
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_06_10 %>% 
+  ggplot(aes(.fitted, .resid)) +
+  geom_jitter(alpha = .5) +
+  geom_hline(yintercept = 0,
+             color = "darkorange",
+             linetype = "dashed")
+
+
+qqnorm(modelo_tot_06_10$residuals)
+qqline(modelo_tot_06_10$residuals,
+       col = 2,
+       lwd = 2,
+       lty = 2)
+```
+
+
+
+

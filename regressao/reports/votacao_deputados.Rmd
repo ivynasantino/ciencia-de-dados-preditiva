@@ -11,12 +11,18 @@ library(here)
 library(dplyr)
 theme_set(theme_minimal())
 library(corrplot)
+library(RColorBrewer)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-eleicao_2006 = read_csv(here("data/eleicoes_2006.csv"))
-eleicao_2010 = read_csv(here("data/eleicoes_2010.csv"))
-eleicao_2006_2010 = read_csv(here("data/eleicoes_2006_e_2010.csv"))
+importa_eleicao <- function(dataset_path) {
+  read = read_csv(here(paste("data", dataset_path, sep = "/")))
+  return(read)
+}
+
+eleicao_2006 <- importa_eleicao("eleicoes_2006.csv")
+eleicao_2010 <- importa_eleicao("eleicoes_2010.csv")
+eleicao_2006_2010 <- importa_eleicao("eleicoes_2006_e_2010.csv")
 ```
 
 Perguntas:
@@ -29,11 +35,10 @@ names(eleicao_2006)
 ```
 
 
-### Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
-```{r, message=FALSE, warning=FALSE}
-# 2006
-correlacao <- eleicao_2006 %>% 
-  select(qtd_doacoes = quantidade_doacoes,
+```{r}
+seleciona_variaveis <- function(dataframe) {
+  return(dataframe %>% 
+    select(qtd_doacoes = quantidade_doacoes,
          qtd_doadores = quantidade_doadores,
          tot_receita = total_receita,
          med_receita = media_receita,
@@ -46,11 +51,22 @@ correlacao <- eleicao_2006 %>%
          qtd_fornec = quantidade_fornecedores,
          tot_desp = total_despesa,
          med_desp = media_despesa,
-         votos) %>% 
+         votos))
+}
+
+select_2006 <- seleciona_variaveis(eleicao_2006)
+select_2010 <- seleciona_variaveis(eleicao_2010)
+
+```
+
+
+### Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
+```{r, message=FALSE, warning=FALSE}
+# 2006
+correlacao_06 <- select_2006 %>% 
   cor()
 
-library(RColorBrewer)
-corrplot(correlacao, type = "upper",
+corrplot(correlacao_06, type = "upper",
          order = "hclust",
          number.cex = .6,
          addCoef.col = "#FF7F50",
@@ -61,25 +77,10 @@ corrplot(correlacao, type = "upper",
 
 ```{r, message=FALSE, warning=FALSE}
 # 2010
-correlacao <- eleicao_2010 %>% 
-  select(qtd_doacoes = quantidade_doacoes,
-         qtd_doadores = quantidade_doadores,
-         tot_receita = total_receita,
-         med_receita = media_receita,
-         outros_cand = recursos_de_outros_candidatos.comites,
-         pes_fisica = recursos_de_pessoas_fisicas,
-         pes_juridica = recursos_de_pessoas_juridicas,
-         rec_prop = recursos_proprios,
-         rec_partido = recursos_de_partido_politico,
-         qtd_desp = quantidade_despesas,
-         qtd_fornec = quantidade_fornecedores,
-         tot_desp = total_despesa,
-         med_desp = media_despesa,
-         votos) %>% 
+correlacao_10 <- select_2010 %>% 
   cor()
 
-library(RColorBrewer)
-corrplot(correlacao, type = "upper",
+corrplot(correlacao_10, type = "upper",
          order = "hclust",
          number.cex = .6,
          addCoef.col = "#B22222",
@@ -94,52 +95,29 @@ corrplot(correlacao, type = "upper",
   Compare os valores de R2 e RSE considerando as regressões para cada ano.
   Inclua outros pontos de comparação que você ache interessante.
 
-```{r}
-eleicao_2006 %>% 
-  select(qtd_doacoes = quantidade_doacoes,
-         qtd_doadores = quantidade_doadores,
-         tot_receita = total_receita,
-         med_receita = media_receita,
-         outros_cand = recursos_de_outros_candidatos.comites,
-         pes_fisica = recursos_de_pessoas_fisicas,
-         pes_juridica = recursos_de_pessoas_juridicas,
-         rec_prop = recursos_proprios,
-         rec_partido = recursos_de_partido_politico,
-         qtd_desp = quantidade_despesas,
-         qtd_fornec = quantidade_fornecedores,
-         tot_desp = total_despesa,
-         med_desp = media_despesa,
-         votos) %>% 
+```{r, message=FALSE, warning=FALSE}
+select_2006 %>% 
   gather(key = "variavel",
          value = "valor") %>% 
   ggplot(aes(x = valor)) +
   geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x")
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Linear")
+
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = log(valor))) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Log")
+
+
   
 ```
 
 
 ```{r}
-eleicao_2006 %>% 
-  select(qtd_doacoes = quantidade_doacoes,
-         qtd_doadores = quantidade_doadores,
-         tot_receita = total_receita,
-         med_receita = media_receita,
-         outros_cand = recursos_de_outros_candidatos.comites,
-         pes_fisica = recursos_de_pessoas_fisicas,
-         pes_juridica = recursos_de_pessoas_juridicas,
-         rec_prop = recursos_proprios,
-         rec_partido = recursos_de_partido_politico,
-         qtd_desp = quantidade_despesas,
-         qtd_fornec = quantidade_fornecedores,
-         tot_desp = total_despesa,
-         med_desp = media_despesa,
-         votos) %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = log(valor))) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x")
-  
+
 ```
 

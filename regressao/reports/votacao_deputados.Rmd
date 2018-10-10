@@ -61,7 +61,24 @@ eleicao_2010$ocupacao <- as.numeric(eleicao_2010$ocupacao)
   
 ```
 
+```{r}
+names(eleicao_2006)
+```
+
+
+
 ```{r, message=FALSE, warning=FALSE}
+#eleicao_2006$quantidade_doacoes = log(eleicao_2006$quantidade_doacoes)
+#eleicao_2006$quantidade_doadores = log(eleicao_2006$quantidade_doadores)
+#eleicao_2006$total_receita = log(eleicao_2006$total_receita)
+#eleicao_2006$media_receita = log(eleicao_2006$media_receita)
+#eleicao_2006$recursos_de_pessoas_fisicas = log(eleicao_2006$recursos_de_pessoas_fisicas)
+#eleicao_2006$recursos_de_pessoas_juridicas = log(eleicao_2006$recursos_de_pessoas_juridicas)
+#eleicao_2006$total_despesa = log(eleicao_2006$total_despesa)
+#eleicao_2006$media_despesa = log(eleicao_2006$media_despesa)
+#eleicao_2006$votos = log(eleicao_2006$votos)
+
+
 eleicao_2006$uf <- as.factor(eleicao_2006$uf)
 eleicao_2006$partido <- as.factor(eleicao_2006$partido)
 eleicao_2006$sexo <- as.factor(eleicao_2006$sexo)
@@ -121,15 +138,19 @@ summary(modelo_tot_06)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
+print(mean(modelo_tot_06$residuals))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
 modelo_tot_06 %>% 
   ggplot(aes(.fitted, .resid)) +
   geom_jitter(alpha = .5) +
   geom_hline(yintercept = 0,
              color = "darkorange",
              linetype = "dashed")
-```
 
-```{r}
+
 qqnorm(modelo_tot_06$residuals)
 qqline(modelo_tot_06$residuals,
        col = 2,
@@ -156,6 +177,26 @@ modelo_tot_10 <- lm(votos ~ .,
 summary(modelo_tot_10)
 ```
 
+```{r, message=FALSE, warning=FALSE}
+print(mean(modelo_tot_10$residuals))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_10 %>% 
+  ggplot(aes(.fitted, .resid)) +
+  geom_jitter(alpha = .5) +
+  geom_hline(yintercept = 0,
+             color = "darkorange",
+             linetype = "dashed")
+
+qqnorm(modelo_tot_10$residuals)
+qqline(modelo_tot_10$residuals,
+       col = 2,
+       lwd = 2,
+       lty = 2)
+
+```
 
 ### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
   Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
@@ -207,28 +248,76 @@ corrplot(correlacao_10, type = "upper",
 ```
 correlacao forte com relacao a voto: pes_juridica = 0.54, tot_receita = 0.63, tot_desp = 0.64
 
-escolher = tot_desp
+escolher = tot_desp, tot_desp
 
 ### 4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
 
-```{r}
-a <- select_2006 %>% 
+```{r, message=FALSE, warning=FALSE}
+a <- eleicao_2006 %>% 
   select(votos,
-         tot_desp,
-         tot_receita,
-         med_receita)
+         total_despesa,
+         total_receita,
+         media_receita,
+         recursos_de_pessoas_fisicas,
+         recursos_de_pessoas_juridicas)
 ```
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 modelo_06 <- lm(votos ~ .,
                 data = a,
                 na.action = na.omit)
 ```
 
 ```{r}
+print(mean(modelo_06$residuals))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
 summary(modelo_06)
 ```
+
+
+```{r, message=FALSE, warning=FALSE}
+b <- select_2010 %>% 
+  select(votos,
+         tot_desp,
+         tot_receita)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+modelo_10 <- lm(votos ~ .,
+                data = b,
+                na.action = na.omit)
+```
+
+```{r}
+print(mean(modelo_10$residuals))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_10)
+```
+
+```{r, message=FALSE, warning=FALSE}
+modelo_06 %>% 
+  ggplot(aes(.fitted, .resid)) +
+  geom_jitter(alpha = .5) +
+  geom_hline(yintercept = 0,
+             color = "darkorange",
+             linetype = "dashed")
+
+
+qqnorm(modelo_06$residuals)
+qqline(modelo_06$residuals,
+       col = 2,
+       lwd = 2,
+       lty = 2)
+```
+
 
 ### 5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
 

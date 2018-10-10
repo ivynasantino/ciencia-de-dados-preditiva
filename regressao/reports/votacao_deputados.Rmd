@@ -11,6 +11,7 @@ library(here)
 library(dplyr)
 library(corrplot)
 library(RColorBrewer)
+options(max.print = .Machine$integer.max)
 theme_set(theme_minimal())
 ```
 
@@ -28,6 +29,27 @@ eleicao_2006_2010 <- importa_eleicao("eleicoes_2006_e_2010.csv")
 ```{r}
 names(eleicao_2006)
 ```
+
+```{r, message=FALSE, warning=FALSE}
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = valor)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Linear")
+
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = log(valor))) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Log")
+
+```
+
+
 
 ```{r, message=FALSE, warning=FALSE}
 eleicao_2010$uf <- as.numeric(eleicao_2010$uf)
@@ -109,10 +131,10 @@ modelo_tot_06 %>%
 
 ```{r}
 qqnorm(modelo_tot_06$residuals)
-qqline(modelo_tot_06$residuals, 
+qqline(modelo_tot_06$residuals,
        col = 2,
-       lwd=2,
-       lty=2)
+       lwd = 2,
+       lty = 2)
 ```
 
 
@@ -134,25 +156,6 @@ modelo_tot_10 <- lm(votos ~ .,
 summary(modelo_tot_10)
 ```
 
-
-```{r, message=FALSE, warning=FALSE}
-select_2006 %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = valor)) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Linear")
-
-select_2006 %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = log(valor))) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Log")
-
-```
 
 ### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
   Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
@@ -179,10 +182,15 @@ corrplot(correlacao_06, type = "upper",
 ```
 Variáveis úteis para voto
 
-correlacao forte com relacao a votos: tot_desp = 0.66, pes_juridica = 0.59, tot_receita = 0.64, med_receita = 0.48
-
-todas possuem correlação forte entre si, então escolhi tot_desp para construir o modelo já tem maior correlação entre 
-escolher = tot_desp
+correlacao forte com relacao a votos: tot_desp = 0.66, e
+                                      -pes_juridica = 0.59, 
+                                      tot_receita = 0.64, e
+                                      med_receita = 0.48, e
+                                      -qnt_fornec = 0.43, 
+                                      -qnt_desp = 0.42, 
+                                      pes_fisica = 0.44, 
+                                      qtd_doacoes = 0.47, 
+                                      qnt_doadores = 0.47
 
 
 ```{r, message=FALSE, warning=FALSE}
@@ -203,29 +211,24 @@ escolher = tot_desp
 
 ### 4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
 
-```{r, message=FALSE, warning=FALSE}
-#2006
-modelo_06 <- lm(votos ~ total_despesa, 
-                data = eleicao_2006_mod,
+```{r}
+a <- select_2006 %>% 
+  select(votos,
+         tot_desp,
+         tot_receita,
+         med_receita)
+```
+
+
+```{r}
+modelo_06 <- lm(votos ~ .,
+                data = a,
                 na.action = na.omit)
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r}
 summary(modelo_06)
 ```
-
-
-```{r, message=FALSE, warning=FALSE}
-#2010
-modelo_10 <- lm(votos ~ total_despesa, 
-                data = eleicao_2010_mod,
-                na.action = na.omit)
-```
-
-```{r, message=FALSE, warning=FALSE}
-summary(modelo_10)
-```
-
 
 ### 5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
 

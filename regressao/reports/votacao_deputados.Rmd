@@ -9,9 +9,9 @@ output: html_document
 library(tidyverse)
 library(here)
 library(dplyr)
-theme_set(theme_minimal())
 library(corrplot)
 library(RColorBrewer)
+theme_set(theme_minimal())
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -29,8 +29,28 @@ eleicao_2006_2010 <- importa_eleicao("eleicoes_2006_e_2010.csv")
 names(eleicao_2006)
 ```
 
+```{r, message=FALSE, warning=FALSE}
+eleicao_2010$uf <- as.factor(eleicao_2010$uf)
+eleicao_2010$partido <- as.factor(eleicao_2010$partido)
+eleicao_2010$sexo <- as.factor(eleicao_2010$sexo)
+eleicao_2010$grau <- as.factor(eleicao_2010$grau)
+eleicao_2010$estado_civil <- as.factor(eleicao_2010$estado_civil)
+eleicao_2010$ocupacao <- as.factor(eleicao_2010$ocupacao)
+  
+```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
+eleicao_2006$uf <- as.factor(eleicao_2006$uf)
+eleicao_2006$partido <- as.factor(eleicao_2006$partido)
+eleicao_2006$sexo <- as.factor(eleicao_2006$sexo)
+eleicao_2006$grau <- as.factor(eleicao_2006$grau)
+eleicao_2006$estado_civil <- as.factor(eleicao_2006$estado_civil)
+eleicao_2006$ocupacao <- as.factor(eleicao_2006$ocupacao)
+  
+```
+
+
+```{r, message=FALSE, warning=FALSE}
 seleciona_variaveis <- function(dataframe) {
   return(dataframe %>% 
     select(qtd_doacoes = quantidade_doacoes,
@@ -56,11 +76,32 @@ select_2006_2010 <- seleciona_variaveis(eleicao_2006_2010)
 ```
 
 
-### Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
+### 1. Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
 fazer uma regressao multipla com todas as variaveis e ver se é legal
-```{r, message=FALSE, warning=FALSE}
 
+
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_06 <- lm(votos ~ ., data = eleicao_2006 %>% 
+                   select(-cargo, 
+                          -nome, 
+                          -sequencial_candidato))
 ```
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_tot_06)
+```
+
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_10 <- lm(votos ~ ., data = eleicao_2010 %>% 
+                   select(-cargo, 
+                          -nome, 
+                          -sequencial_candidato))
+```
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_tot_10)
+```
+
 
 
 ```{r, message=FALSE, warning=FALSE}
@@ -88,9 +129,7 @@ select_2006 %>%
   Compare os valores de R2 e RSE considerando as regressões para cada ano.
   Inclua outros pontos de comparação que você ache interessante.
 
-```{r, message=FALSE, warning=FALSE}
-
-```
+Explicar modelo da questão 1
 
 ### 3.Todas as variáveis são úteis para os modelos de regressão? Há variáveis redudantes? Faça análises para 2006 e 2010 separadamente. 
 
@@ -107,6 +146,13 @@ corrplot(correlacao_06, type = "upper",
          col = brewer.pal(n = 8, name = "PuOr"))
 
 ```
+Variáveis úteis para voto
+
+correlacao forte com relacao a votos: tot_desp = 0.66, pes_juridica = 0.59, tot_receita = 0.64, med_receita = 0.48
+
+todas possuem correlação forte entre si, então escolhi tot_desp para construir o modelo já tem maior correlação entre 
+escolher = tot_desp
+
 
 ```{r, message=FALSE, warning=FALSE}
 # 2010
@@ -120,13 +166,22 @@ corrplot(correlacao_10, type = "upper",
          tl.col = "black", tl.srt = 90,
          col = brewer.pal(n = 8, name = "RdYlBu"))
 ```
+correlacao forte com relacao a voto: pes_juridica = 0.54, tot_receita = 0.63, tot_desp = 0.64
 
+escolher = tot_desp
 
 ### 4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
 
 ```{r, message=FALSE, warning=FALSE}
 #2006
+modelo_06 <- lm(votos ~ total_despesa, data = eleicao_2006 %>% 
+                  select(total_despesa))
 ```
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_06)
+```
+
 
 
 ```{r, message=FALSE, warning=FALSE}

@@ -30,12 +30,12 @@ names(eleicao_2006)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-eleicao_2010$uf <- as.factor(eleicao_2010$uf)
-eleicao_2010$partido <- as.factor(eleicao_2010$partido)
-eleicao_2010$sexo <- as.factor(eleicao_2010$sexo)
-eleicao_2010$grau <- as.factor(eleicao_2010$grau)
-eleicao_2010$estado_civil <- as.factor(eleicao_2010$estado_civil)
-eleicao_2010$ocupacao <- as.factor(eleicao_2010$ocupacao)
+eleicao_2010$uf <- as.numeric(eleicao_2010$uf)
+eleicao_2010$partido <- as.numeric(eleicao_2010$partido)
+eleicao_2010$sexo <- as.numeric(eleicao_2010$sexo)
+eleicao_2010$grau <- as.numeric(eleicao_2010$grau)
+eleicao_2010$estado_civil <- as.numeric(eleicao_2010$estado_civil)
+eleicao_2010$ocupacao <- as.numeric(eleicao_2010$ocupacao)
   
 ```
 
@@ -79,12 +79,19 @@ select_2006_2010 <- seleciona_variaveis(eleicao_2006_2010)
 ### 1. Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
 fazer uma regressao multipla com todas as variaveis e ver se é legal
 
+```{r, message=FALSE, warning=FALSE}
+eleicao_2006_mod <- eleicao_2006 %>% 
+  select(-cargo,
+         -nome,
+         -sequencial_candidato,
+         -ano)
+```
+
 
 ```{r, message=FALSE, warning=FALSE}
-modelo_tot_06 <- lm(votos ~ ., data = eleicao_2006 %>% 
-                   select(-cargo, 
-                          -nome, 
-                          -sequencial_candidato))
+modelo_tot_06 <- lm(votos ~ ., 
+                    data = eleicao_2006_mod, 
+                    na.action = na.omit)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -92,16 +99,40 @@ summary(modelo_tot_06)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-modelo_tot_10 <- lm(votos ~ ., data = eleicao_2010 %>% 
-                   select(-cargo, 
-                          -nome, 
-                          -sequencial_candidato))
+modelo_tot_06 %>% 
+  ggplot(aes(.fitted, .resid)) +
+  geom_jitter(alpha = .5) +
+  geom_hline(yintercept = 0,
+             color = "darkorange",
+             linetype = "dashed")
+```
+
+```{r}
+qqnorm(modelo_tot_06$residuals)
+qqline(modelo_tot_06$residuals, 
+       col = 2,
+       lwd=2,
+       lty=2)
+```
+
+
+```{r}
+eleicao_2010_mod <- eleicao_2010 %>% 
+  select(-cargo,
+         -nome,
+         -sequencial_candidato,
+         -ano)
+```
+
+```{r, message=FALSE, warning=FALSE}
+modelo_tot_10 <- lm(votos ~ ., 
+                    data = eleicao_2010_mod,
+                    na.action = na.omit)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
 summary(modelo_tot_10)
 ```
-
 
 
 ```{r, message=FALSE, warning=FALSE}
@@ -174,8 +205,9 @@ escolher = tot_desp
 
 ```{r, message=FALSE, warning=FALSE}
 #2006
-modelo_06 <- lm(votos ~ total_despesa, data = eleicao_2006 %>% 
-                  select(total_despesa))
+modelo_06 <- lm(votos ~ total_despesa, 
+                data = eleicao_2006_mod,
+                na.action = na.omit)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -183,9 +215,15 @@ summary(modelo_06)
 ```
 
 
-
 ```{r, message=FALSE, warning=FALSE}
 #2010
+modelo_10 <- lm(votos ~ total_despesa, 
+                data = eleicao_2010_mod,
+                na.action = na.omit)
+```
+
+```{r, message=FALSE, warning=FALSE}
+summary(modelo_10)
 ```
 
 

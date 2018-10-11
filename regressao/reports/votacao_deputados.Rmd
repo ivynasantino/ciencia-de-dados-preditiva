@@ -232,13 +232,20 @@ qqline(modelo_tot_10$residuals,
 
 ```
 
+Depois de visto todas as informações acima, podemos traçar um modelo para cada eleição com uma quantidade menor de variáveis, já muitas delas tem pouca significância para se fazer uma regressão.
+
+
 ### 2.Compare as regressões construídas para 2006 e 2010. Quais as diferenças/semelhanças percebidas? Algumas sugestões:
   Analise os plots de resíduos e verifique se há tendências nos erros para cada ano.
   Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
   Compare os valores de R2 e RSE considerando as regressões para cada ano.
   Inclua outros pontos de comparação que você ache interessante.
+  
+Nos passos anteriores, fizemos uma breve análise dos dados, e podemos ver que os modelos tem algumas semelhanças, como o p-valor que são bem baixos, quase próximos de zero. No entanto diferem nos valores de R-quadrado, R-ajustado e variáveis com maior significância, com apenas total de despesa em comum.
 
 ### 3.Todas as variáveis são úteis para os modelos de regressão? Há variáveis redudantes? Faça análises para 2006 e 2010 separadamente. 
+
+Para responder essa pergunta, utilizamos o dataframe que retiramos as variáveis categóricas.
 
 ```{r, message=FALSE, warning=FALSE}
 # 2006
@@ -265,7 +272,9 @@ correlacao forte com relacao a votos: tot_desp = 0.66, e
                                       qtd_doacoes = 0.47, 
                                       qnt_doadores = 0.47
 
+Para o ano de 2006, de acordo com o correlograma, temos algumas variáveis com maior valor de correlação, mostrada com cores mais fortes. Dessa forma, para selecionar as melhores variáveis, selecionei as que possuem maior correlação com votos, já que queremos explicar quais impactam mais na decisão de votos nas eleições, e as tinham maior correlação entre si para posteriormente retirar as que são redundantes. 
 
+Feito isso, temos que total de despesa, total de receita e media de receita são as variáveis que melhor explicam a maior quantidade de votos.
 ```{r, message=FALSE, warning=FALSE}
 # 2010
 correlacao_10 <- select_2010 %>% 
@@ -278,11 +287,14 @@ corrplot(correlacao_10, type = "upper",
          tl.col = "black", tl.srt = 90,
          col = brewer.pal(n = 8, name = "RdYlBu"))
 ```
-correlacao forte com relacao a voto: pes_juridica = 0.54, tot_receita = 0.63, tot_desp = 0.64
 
-escolher = tot_desp, tot_desp
+Utizando as mesma técnicas, podemos observar que pelo correlograma total de despesa foi a variável com maior relação com votos em 2010.
 
 ### 4.No caso de haver variáveis pouco explicativas e/ou redudantes, construa um novo modelo sem essas variáveis e o compare ao modelo com todas as variáveis (e.g. em termos de R2 e RSE). Faça isso para 2006 e 2010 separadamente. 
+
+Dessa forma, utilzando as variáveis com forte significância e maior correlação pelo correlograma, podemos traçar os modelos para 2006 e 2010 com uma quantidade menor de variáveis.
+
+Para 2006:
 
 ```{r, message=FALSE, warning=FALSE}
 a <- eleicao_2006 %>% 
@@ -310,6 +322,25 @@ print(mean(modelo_06$residuals))
 summary(modelo_06)
 ```
 
+```{r, message=FALSE, warning=FALSE}
+modelo_06 %>% 
+  ggplot(aes(.fitted, .resid)) +
+  geom_jitter(alpha = .5) +
+  geom_hline(yintercept = 0,
+             color = "darkorange",
+             linetype = "dashed") +
+  labs(title = "Novo modelo: gráfico de resíduos vs ajustamento (2006)")
+
+
+qqnorm(modelo_06$residuals)
+qqline(modelo_06$residuals,
+       col = 2,
+       lwd = 2,
+       lty = 2)
+```
+
+
+Para 2010:
 
 ```{r, message=FALSE, warning=FALSE}
 b <- select_2010 %>% 
@@ -337,26 +368,29 @@ print(mean(modelo_10$residuals))
 summary(modelo_10)
 ```
 
+
 ```{r, message=FALSE, warning=FALSE}
-modelo_06 %>% 
+modelo_10 %>% 
   ggplot(aes(.fitted, .resid)) +
   geom_jitter(alpha = .5) +
   geom_hline(yintercept = 0,
              color = "darkorange",
              linetype = "dashed") +
-  labs(title = "Gráfico de resíduos vs ajustamento")
+  labs(title = "Novo modelo: gráfico de resíduos vs ajustamento (2010)")
+ 
 
-
-qqnorm(modelo_06$residuals)
-qqline(modelo_06$residuals,
+qqnorm(modelo_10$residuals)
+qqline(modelo_10$residuals,
        col = 2,
        lwd = 2,
        lty = 2)
 ```
 
+Assim como no modelo com todas as variáveis temos valores baixos para p-valor e resíduos, que é uma métrica legal para um bom modelo, além de serem compostos por variáveis com alto nível de significância.
 
 ### 5.Construa agora uma regressão considerando os anos 2006 e 2010 em conjunto. Que diferenças/semelhanças você percebe em relação aos modelos individuais por ano? Veja a questão 2 para sugestões que você usar para comparação.
 
+Repetindo os mesmos procedimentos anteriores para encontrar variáveis com maior significância:
 
 ```{r, message=FALSE, warning=FALSE}
 eleicao_06_10_mod <- eleicao_2006_2010 %>% 
@@ -377,6 +411,8 @@ modelo_tot_06_10 <- lm(votos ~ .,
 summary(modelo_tot_06)
 ```
 
+Podemos observar que o R-quadrado e R-ajustado são os valores encontrados para a eleição de 2006 e as variáveis com maior significância são total de despesa, média de despesa, recursos de pessoas físicas e jurídicas. Algo interessante para se notar, que as características mais fortes de cada modelo se sobressaiu na junção das duas bases de dados.
+
 ```{r, message=FALSE, warning=FALSE}
 
 correlacao_06_10 <- select_2006_2010 %>% 
@@ -391,7 +427,9 @@ corrplot(correlacao_06_10, type = "upper",
 
 ```
 
-votos = tot_desp + qnt_doacoes
+Já para o correlograma, antes de mostrar as variáveis com melhor relação a votos, podemos ver algo interessante com as variáveis de quantidade de doadores e quantidade de doações, temos correlção 1, ou seja, é uma correlação muito forte, e ambas possuem relação forte com votos, então temos uma situação de redundância, dessa maneira podemos escolher uma delas. Feito essa análise com todas as variáveis, podemos destacar total de despesa e quantidade de doações para traçar um modelo a seguir:
+
+Obs.: também utilizei as variáveis com maior significância feito anteriormente.
 
 ```{r, message=FALSE, warning=FALSE}
 c <- eleicao_2006_2010 %>% 
@@ -421,6 +459,8 @@ print(mean(modelo_tot_06_10$residuals))
 summary(modelo_tot_06_10)
 ```
 
+Para esse modelo, temos valores bem parecidos com os feitos anteriormente, com valores de p-valor e resíduos próximos a zero. No entanto, o R-quadrado e R-ajustado tiveram valores mais baixos.
+
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_06_10 %>% 
   ggplot(aes(.fitted, .resid)) +
@@ -428,7 +468,7 @@ modelo_tot_06_10 %>%
   geom_hline(yintercept = 0,
              color = "darkorange",
              linetype = "dashed") +
-  labs(title = "Gráfico de resíduos vs ajustamento")
+  labs(title = "Novo modelo: gráfico de resíduos vs ajustamento (2006-2010)")
 
 
 qqnorm(modelo_tot_06_10$residuals)
@@ -438,6 +478,6 @@ qqline(modelo_tot_06_10$residuals,
        lty = 2)
 ```
 
-
+Para os gráficos acima, podemos observar que o novo modelo para 2006 e 2010, os pontos do plot de resíduos vs ajustamento estão menos concentrados, no entanto ainda tendenciosos.
 
 

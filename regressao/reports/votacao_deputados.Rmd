@@ -30,25 +30,6 @@ eleicao_2006_2010 <- importa_eleicao("eleicoes_2006_e_2010.csv")
 names(eleicao_2006)
 ```
 
-```{r, message=FALSE, warning=FALSE}
-select_2006 %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = valor)) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Linear")
-
-select_2006 %>% 
-  gather(key = "variavel",
-         value = "valor") %>% 
-  ggplot(aes(x = log(valor))) +
-  geom_histogram(bins = 30) +
-  facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Log")
-
-```
-
 
 
 ```{r, message=FALSE, warning=FALSE}
@@ -66,25 +47,27 @@ names(eleicao_2006)
 ```
 
 
-
 ```{r, message=FALSE, warning=FALSE}
-#eleicao_2006$quantidade_doacoes = log(eleicao_2006$quantidade_doacoes)
-#eleicao_2006$quantidade_doadores = log(eleicao_2006$quantidade_doadores)
-#eleicao_2006$total_receita = log(eleicao_2006$total_receita)
-#eleicao_2006$media_receita = log(eleicao_2006$media_receita)
-#eleicao_2006$recursos_de_pessoas_fisicas = log(eleicao_2006$recursos_de_pessoas_fisicas)
-#eleicao_2006$recursos_de_pessoas_juridicas = log(eleicao_2006$recursos_de_pessoas_juridicas)
-#eleicao_2006$total_despesa = log(eleicao_2006$total_despesa)
-#eleicao_2006$media_despesa = log(eleicao_2006$media_despesa)
-#eleicao_2006$votos = log(eleicao_2006$votos)
-
-
 eleicao_2006$uf <- as.factor(eleicao_2006$uf)
 eleicao_2006$partido <- as.factor(eleicao_2006$partido)
 eleicao_2006$sexo <- as.factor(eleicao_2006$sexo)
 eleicao_2006$grau <- as.factor(eleicao_2006$grau)
 eleicao_2006$estado_civil <- as.factor(eleicao_2006$estado_civil)
 eleicao_2006$ocupacao <- as.factor(eleicao_2006$ocupacao)
+
+eleicao_2010$uf <- as.factor(eleicao_2010$uf)
+eleicao_2010$partido <- as.factor(eleicao_2010$partido)
+eleicao_2010$sexo <- as.factor(eleicao_2010$sexo)
+eleicao_2010$grau <- as.factor(eleicao_2010$grau)
+eleicao_2010$estado_civil <- as.factor(eleicao_2010$estado_civil)
+eleicao_2010$ocupacao <- as.factor(eleicao_2010$ocupacao)
+
+eleicao_2006_2010$uf <- as.factor(eleicao_2006_2010$uf)
+eleicao_2006_2010$partido <- as.factor(eleicao_2006_2010$partido)
+eleicao_2006_2010$sexo <- as.factor(eleicao_2006_2010$sexo)
+eleicao_2006_2010$grau <- as.factor(eleicao_2006_2010$grau)
+eleicao_2006_2010$estado_civil <- as.factor(eleicao_2006_2010$estado_civil)
+eleicao_2006_2010$ocupacao <- as.factor(eleicao_2006_2010$ocupacao)
   
 ```
 
@@ -115,8 +98,28 @@ select_2006_2010 <- seleciona_variaveis(eleicao_2006_2010)
 ```
 
 
+
+```{r, message=FALSE, warning=FALSE}
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = valor)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Linear")
+
+select_2006 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = log(valor))) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Log")
+
+```
+
+
 ### 1. Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
-fazer uma regressao multipla com todas as variaveis e ver se é legal
 
 ```{r, message=FALSE, warning=FALSE}
 eleicao_2006_mod <- eleicao_2006 %>% 
@@ -148,7 +151,8 @@ modelo_tot_06 %>%
   geom_jitter(alpha = .5) +
   geom_hline(yintercept = 0,
              color = "darkorange",
-             linetype = "dashed")
+             linetype = "dashed") +
+  labs(title = "Gráfico de resíduos vs ajustamento")
 
 
 qqnorm(modelo_tot_06$residuals)
@@ -159,7 +163,7 @@ qqline(modelo_tot_06$residuals,
 ```
 
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 eleicao_2010_mod <- eleicao_2010 %>% 
   select(-cargo,
          -nome,
@@ -188,7 +192,8 @@ modelo_tot_10 %>%
   geom_jitter(alpha = .5) +
   geom_hline(yintercept = 0,
              color = "darkorange",
-             linetype = "dashed")
+             linetype = "dashed") +
+  labs(title = "Gráfico de resíduos vs ajustamento")
 
 qqnorm(modelo_tot_10$residuals)
 qqline(modelo_tot_10$residuals,
@@ -203,8 +208,6 @@ qqline(modelo_tot_10$residuals,
   Quais variáveis conseguem explicar melhor o número de votos? Compare essas variáveis entre os modelos. Mesma coisa para as variáveis menos explicativas.
   Compare os valores de R2 e RSE considerando as regressões para cada ano.
   Inclua outros pontos de comparação que você ache interessante.
-
-Explicar modelo da questão 1
 
 ### 3.Todas as variáveis são úteis para os modelos de regressão? Há variáveis redudantes? Faça análises para 2006 e 2010 separadamente. 
 
@@ -283,7 +286,10 @@ summary(modelo_06)
 b <- select_2010 %>% 
   select(votos,
          tot_desp,
-         tot_receita)
+         pes_juridica,
+         pes_fisica,
+         rec_partido
+         )
 ```
 
 
@@ -308,7 +314,8 @@ modelo_06 %>%
   geom_jitter(alpha = .5) +
   geom_hline(yintercept = 0,
              color = "darkorange",
-             linetype = "dashed")
+             linetype = "dashed") +
+  labs(title = "Gráfico de resíduos vs ajustamento")
 
 
 qqnorm(modelo_06$residuals)
@@ -365,7 +372,7 @@ c <- eleicao_2006_2010 %>%
          recursos_de_outros_candidatos.comites,
          recursos_de_pessoas_fisicas,
          recursos_de_pessoas_juridicas,
-         quantidade_doacoes,
+         quantidade_doacoes
          )
 ```
 
@@ -391,7 +398,8 @@ modelo_tot_06_10 %>%
   geom_jitter(alpha = .5) +
   geom_hline(yintercept = 0,
              color = "darkorange",
-             linetype = "dashed")
+             linetype = "dashed") +
+  labs(title = "Gráfico de resíduos vs ajustamento")
 
 
 qqnorm(modelo_tot_06_10$residuals)

@@ -15,6 +15,8 @@ options(max.print = .Machine$integer.max)
 theme_set(theme_minimal())
 ```
 
+Para dar início a nossa análise, vamos importar os dados das eleições 2006 e 2010.
+
 ```{r, message=FALSE, warning=FALSE}
 importa_eleicao <- function(dataset_path) {
   read = read_csv(here(paste("data", dataset_path, sep = "/")))
@@ -26,26 +28,14 @@ eleicao_2010 <- importa_eleicao("eleicoes_2010.csv")
 eleicao_2006_2010 <- importa_eleicao("eleicoes_2006_e_2010.csv")
 ```
 
-```{r}
-names(eleicao_2006)
-```
-
-
+Temos as seguintes váriaveis para análise:
 
 ```{r, message=FALSE, warning=FALSE}
-eleicao_2010$uf <- as.numeric(eleicao_2010$uf)
-eleicao_2010$partido <- as.numeric(eleicao_2010$partido)
-eleicao_2010$sexo <- as.numeric(eleicao_2010$sexo)
-eleicao_2010$grau <- as.numeric(eleicao_2010$grau)
-eleicao_2010$estado_civil <- as.numeric(eleicao_2010$estado_civil)
-eleicao_2010$ocupacao <- as.numeric(eleicao_2010$ocupacao)
-  
-```
-
-```{r}
 names(eleicao_2006)
 ```
+### Preparando os dados
 
+Antes de começarmos a traçar a análise de regressão, iremos transformar as variáveis categóricas em fator da seguinte forma:
 
 ```{r, message=FALSE, warning=FALSE}
 eleicao_2006$uf <- as.factor(eleicao_2006$uf)
@@ -72,6 +62,8 @@ eleicao_2006_2010$ocupacao <- as.factor(eleicao_2006_2010$ocupacao)
 ```
 
 
+Outro passo é criar um dataframe sem as variáveis categóricas para que possamos posteriormente plotar um correlograma apenas com as variáveis numéricas.
+
 ```{r, message=FALSE, warning=FALSE}
 seleciona_variaveis <- function(dataframe) {
   return(dataframe %>% 
@@ -97,7 +89,9 @@ select_2006_2010 <- seleciona_variaveis(eleicao_2006_2010)
 
 ```
 
+### Familiarizando com os dados
 
+Vamos conhecer um pouco das nossas variáveis através de um histograma e verificar a ocorrência de cada uma delas nos dados de forma linear e logaritmica.
 
 ```{r, message=FALSE, warning=FALSE}
 select_2006 %>% 
@@ -106,7 +100,7 @@ select_2006 %>%
   ggplot(aes(x = valor)) +
   geom_histogram(bins = 30) +
   facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Linear")
+  labs(title = "Eleição 2006: Linear")
 
 select_2006 %>% 
   gather(key = "variavel",
@@ -114,12 +108,36 @@ select_2006 %>%
   ggplot(aes(x = log(valor))) +
   geom_histogram(bins = 30) +
   facet_wrap(~variavel, scales = "free_x") +
-  labs(title = "Log")
+  labs(title = "Eleição 2006: Logaritmica")
 
 ```
 
 
+```{r, message=FALSE, warning=FALSE}
+select_2010 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = valor)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Eleição 2010: Linear")
+
+select_2010 %>% 
+  gather(key = "variavel",
+         value = "valor") %>% 
+  ggplot(aes(x = log(valor))) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~variavel, scales = "free_x") +
+  labs(title = "Eleição 2010: Logaritmica")
+
+```
+
+
+Podemos observar que temos uma maior ocorrência da variável de média de despesas e a com menor ocorrência é recursos do partido para ambas as eleições.
+
 ### 1. Um modelo de regressão múltipla com todas as variáveis é plausível para explicar a variação em y (número de votos) em 2006? Mesma pergunta para 2010.
+
+Para verificar se todas as variáveis são necessárias para nosso modelo iremos fazer alguns procedimentos. O primeiro deles foi descartar as variáveis cargo, nome, sequencial do candidato e o ano, já que não são tão importantes para a regressão, pois algumas delas repetem o nível em todas as ocorrências da base de dados.
 
 ```{r, message=FALSE, warning=FALSE}
 eleicao_2006_mod <- eleicao_2006 %>% 
@@ -129,6 +147,7 @@ eleicao_2006_mod <- eleicao_2006 %>%
          -ano)
 ```
 
+O segundo passo é fazer a regressão, optei por omitir os dados vazios(NA) para não influenciar no resultado final.
 
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_06 <- lm(votos ~ ., 
@@ -136,14 +155,19 @@ modelo_tot_06 <- lm(votos ~ .,
                     na.action = na.omit)
 ```
 
+Depois do modelo traçado, podemos ver as variáveis com alta e baixa significância para o modelo.
 ```{r, message=FALSE, warning=FALSE}
 summary(modelo_tot_06)
 ```
+
+Dessa forma, podemos observar que variáveis com total de despesa, recursos de pessoas física e jurídicas tem um maior nível de significância, podemos observar isso pela presença dos 3 asteriscos ao lado do p-valor. Além dessa informação, também podemos observar o R-quadrado(representa a proporção da variabilidade na variável resposta explicada pela variável preditora) com o valor de 0.5779 e com R-ajustado(é a porcentagem de variação na resposta que é explicada pelo modelo, ajustada para o número de preditores do modelo em relação ao número de observações) com o valor de 0.5488 e p-valor menor que 2.2e-16, número muito próximo de zero, fazendo com que seja um bom modelo.
+
 
 ```{r, message=FALSE, warning=FALSE}
 print(mean(modelo_tot_06$residuals))
 ```
 
+O valor da média dos resíduos está bem próximo de zero.
 
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_06 %>% 
@@ -152,7 +176,7 @@ modelo_tot_06 %>%
   geom_hline(yintercept = 0,
              color = "darkorange",
              linetype = "dashed") +
-  labs(title = "Gráfico de resíduos vs ajustamento")
+  labs(title = "Gráfico de resíduos vs ajustamento para 2006")
 
 
 qqnorm(modelo_tot_06$residuals)
@@ -161,7 +185,9 @@ qqline(modelo_tot_06$residuals,
        lwd = 2,
        lty = 2)
 ```
+Para traçar um modelo bom, o ideal é que os resíduos(pontos) fiquem o mais próximo da linha pontilhada.
 
+Da mesma maneira, vamos fazer os passos para as eleições de 2010.
 
 ```{r, message=FALSE, warning=FALSE}
 eleicao_2010_mod <- eleicao_2010 %>% 
@@ -181,10 +207,13 @@ modelo_tot_10 <- lm(votos ~ .,
 summary(modelo_tot_10)
 ```
 
+Já para as eleições de 2010, as variáveis que tiveram maior significância foram total de despesa e média de receita. Já para os valores de R-quadrado 0.5405, R-ajustado 0.5129 e p-valor menor que 2.2e-16, também bem pequeno, quase próximo de zero.
+
+
 ```{r, message=FALSE, warning=FALSE}
 print(mean(modelo_tot_10$residuals))
 ```
-
+Para a média dos resíduos, também temos um bom valor, bem próximo de zero.
 
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_10 %>% 
@@ -193,7 +222,7 @@ modelo_tot_10 %>%
   geom_hline(yintercept = 0,
              color = "darkorange",
              linetype = "dashed") +
-  labs(title = "Gráfico de resíduos vs ajustamento")
+  labs(title = "Gráfico de resíduos vs ajustamento para 2010")
 
 qqnorm(modelo_tot_10$residuals)
 qqline(modelo_tot_10$residuals,

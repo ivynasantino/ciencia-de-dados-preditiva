@@ -2,7 +2,14 @@
 title: "Usando regressão linear para explicar a votação de deputados"
 author: "Ivyna Santino"
 date: "26 de setembro de 2018"
-output: html_document
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE, message=FALSE}
@@ -14,6 +21,32 @@ library(RColorBrewer)
 options(max.print = .Machine$integer.max)
 theme_set(theme_minimal())
 ```
+
+Dicionário das variáveis:
+
+- sequencial_candidato: id do candidato
+- nome: nome do deputado
+- uf: estado
+- partido: partido do deputado
+- quantidade_doacoes: número de doações diferentes
+- quantidade_doadores: número de doadores diferentes
+- total_receita: soma em R$ das doações
+- media_receita: média das doações
+- recursos_de_outros_candidatos/comites: quantia em R$ das doações provenientes de outros candidatos ou comite partidário
+- recursos_de_pessoas_fisicas: quantia em R$ das doações provenientes de outros CPFs
+- recursos_de_pessoas_juridicas: quantia em R$ das doações provenientes de outros CNPJ
+- recursos_proprios": quantia em R$ das doações provenientes do próprio candidato
+- recursos_de_partido_politico: quantia em R$ das doações provenientes do partido político do candidato
+- votos: variável alvo. Se refere ao número de votos na campanha de 2006 e 2010
+- quantidade_despesas
+- quantidade_fornecedores: número de fornecedores/despesas diferentes
+- total_despesa: soma em R$ das despesas de campanha
+- media_despesa: média das despesas de campanha
+- cargo: deputado
+- Sexo: feminino/masculio
+- grau: grau de instrução do candidato
+- estado_civil: estado civil do deputado
+- ocupacao: ocupação/profissão do candidato
 
 Para dar início a nossa análise, vamos importar os dados das eleições 2006 e 2010.
 
@@ -98,7 +131,8 @@ select_2006 %>%
   gather(key = "variavel",
          value = "valor") %>% 
   ggplot(aes(x = valor)) +
-  geom_histogram(bins = 30) +
+  geom_histogram(bins = 30,
+                 fill = "#FFA07A") +
   facet_wrap(~variavel, scales = "free_x") +
   labs(title = "Eleição 2006: Linear")
 
@@ -106,7 +140,8 @@ select_2006 %>%
   gather(key = "variavel",
          value = "valor") %>% 
   ggplot(aes(x = log(valor))) +
-  geom_histogram(bins = 30) +
+  geom_histogram(bins = 30,
+                 fill = "#FFA07A") +
   facet_wrap(~variavel, scales = "free_x") +
   labs(title = "Eleição 2006: Logaritmica")
 
@@ -118,7 +153,8 @@ select_2010 %>%
   gather(key = "variavel",
          value = "valor") %>% 
   ggplot(aes(x = valor)) +
-  geom_histogram(bins = 30) +
+  geom_histogram(bins = 30,
+                 fill = "#D2691E") +
   facet_wrap(~variavel, scales = "free_x") +
   labs(title = "Eleição 2010: Linear")
 
@@ -126,7 +162,8 @@ select_2010 %>%
   gather(key = "variavel",
          value = "valor") %>% 
   ggplot(aes(x = log(valor))) +
-  geom_histogram(bins = 30) +
+  geom_histogram(bins = 30,
+                 fill = "#D2691E") +
   facet_wrap(~variavel, scales = "free_x") +
   labs(title = "Eleição 2010: Logaritmica")
 
@@ -172,16 +209,17 @@ O valor da média dos resíduos está bem próximo de zero.
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_06 %>% 
   ggplot(aes(.fitted, .resid)) +
-  geom_jitter(alpha = .5) +
+  geom_jitter(alpha = .5,
+              color = "#FF6347") +
   geom_hline(yintercept = 0,
-             color = "darkorange",
+             color = "#6A5ACD",
              linetype = "dashed") +
   labs(title = "Gráfico de resíduos vs ajustamento para 2006")
 
 
 qqnorm(modelo_tot_06$residuals)
 qqline(modelo_tot_06$residuals,
-       col = 2,
+       col = "#6A5ACD",
        lwd = 2,
        lty = 2)
 ```
@@ -218,15 +256,16 @@ Para a média dos resíduos, também temos um bom valor, bem próximo de zero.
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_10 %>% 
   ggplot(aes(.fitted, .resid)) +
-  geom_jitter(alpha = .5) +
+  geom_jitter(alpha = .5,
+              color = "darkorange") +
   geom_hline(yintercept = 0,
-             color = "darkorange",
+             color = "#800080",
              linetype = "dashed") +
   labs(title = "Gráfico de resíduos vs ajustamento para 2010")
 
 qqnorm(modelo_tot_10$residuals)
 qqline(modelo_tot_10$residuals,
-       col = 2,
+       col = "#800080",
        lwd = 2,
        lty = 2)
 
@@ -325,16 +364,17 @@ summary(modelo_06)
 ```{r, message=FALSE, warning=FALSE}
 modelo_06 %>% 
   ggplot(aes(.fitted, .resid)) +
-  geom_jitter(alpha = .5) +
+  geom_jitter(alpha = .5,
+              color = "#FF6347") +
   geom_hline(yintercept = 0,
-             color = "darkorange",
+             color = "#6A5ACD",
              linetype = "dashed") +
   labs(title = "Novo modelo: gráfico de resíduos vs ajustamento (2006)")
 
 
 qqnorm(modelo_06$residuals)
 qqline(modelo_06$residuals,
-       col = 2,
+       col = "#6A5ACD",
        lwd = 2,
        lty = 2)
 ```
@@ -372,16 +412,17 @@ summary(modelo_10)
 ```{r, message=FALSE, warning=FALSE}
 modelo_10 %>% 
   ggplot(aes(.fitted, .resid)) +
-  geom_jitter(alpha = .5) +
+  geom_jitter(alpha = .5,
+              color = "darkorange") +
   geom_hline(yintercept = 0,
-             color = "darkorange",
+             color = "#800080",
              linetype = "dashed") +
   labs(title = "Novo modelo: gráfico de resíduos vs ajustamento (2010)")
  
 
 qqnorm(modelo_10$residuals)
 qqline(modelo_10$residuals,
-       col = 2,
+       col = "#800080",
        lwd = 2,
        lty = 2)
 ```
@@ -464,16 +505,17 @@ Para esse modelo, temos valores bem parecidos com os feitos anteriormente, com v
 ```{r, message=FALSE, warning=FALSE}
 modelo_tot_06_10 %>% 
   ggplot(aes(.fitted, .resid)) +
-  geom_jitter(alpha = .5) +
+  geom_jitter(alpha = .5,
+              color = "#CD5C5C") +
   geom_hline(yintercept = 0,
-             color = "darkorange",
+             color = "#800000",
              linetype = "dashed") +
   labs(title = "Novo modelo: gráfico de resíduos vs ajustamento (2006-2010)")
 
 
 qqnorm(modelo_tot_06_10$residuals)
 qqline(modelo_tot_06_10$residuals,
-       col = 2,
+       col = "#800000",
        lwd = 2,
        lty = 2)
 ```

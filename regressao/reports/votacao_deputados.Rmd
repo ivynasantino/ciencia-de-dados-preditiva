@@ -299,17 +299,6 @@ corrplot(correlacao_06, type = "upper",
          col = brewer.pal(n = 8, name = "PuOr"))
 
 ```
-Variáveis úteis para voto
-
-correlacao forte com relacao a votos: tot_desp = 0.66, e
-                                      -pes_juridica = 0.59, 
-                                      tot_receita = 0.64, e
-                                      med_receita = 0.48, e
-                                      -qnt_fornec = 0.43, 
-                                      -qnt_desp = 0.42, 
-                                      pes_fisica = 0.44, 
-                                      qtd_doacoes = 0.47, 
-                                      qnt_doadores = 0.47
 
 Para o ano de 2006, de acordo com o correlograma, temos algumas variáveis com maior valor de correlação, mostrada com cores mais fortes. Dessa forma, para selecionar as melhores variáveis, selecionei as que possuem maior correlação com votos, já que queremos explicar quais impactam mais na decisão de votos nas eleições, e as tinham maior correlação entre si para posteriormente retirar as que são redundantes. 
 

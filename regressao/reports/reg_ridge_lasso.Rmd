@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(here)
+library(caret)
+theme_set(theme_minimal())
+```
+
+Descrição do problema:
+
+- Usando todas as variáveis disponíveis, tune (usando validação cruzada): 
+  (i) um modelo de regressão Ridge
+  (ii) um modelo de regressão Lasso 
+  (iii) um modelo KNN. Para os modelos de regressão linear, o parâmetro a ser tunado é o lambda (penalização dos coeficientes) e o KNN o número de vizinhos. (9 pts.)
+
+- Compare os três modelos em termos do erro RMSE de validação cruzada. (9 pts.)
+- Quais as variáveis mais importantes segundo o modelo de regressão Ridge e Lasso?  Variáveis foram descartadas pelo Lasso? Quais? (9 pts.)
+- Re-treine o melhor modelo (usando os melhores valores de parâmetros encontrados em todos os dados, sem usar validação cruzada). (9 pts.)
+- Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
+Links para um site externo (9 pts.)
+
+```{r, warning=FALSE, include=FALSE}
+importa_eleicao <- function(dataset_path) {
+  read = read_csv(here(paste("data/all", dataset_path, sep = "/")))
+  return(read)
+}
+
+train = importa_eleicao("train.csv")
+test = importa_eleicao("test.csv")
+```
+
+```{r, warning=FALSE, include=FALSE}
+train <- train %>% 
+  select(-cargo,
+         -sequencial_candidato)
+```
+
+
+```{r, warning=FALSE, include=FALSE}
+modelo_ridge <- train(votos ~ .,
+                     data = train,
+                     method = "ridge")
+
+
+modelo_lasso <- train(votos ~ .,
+                     data = train,
+                     method = "lasso")
+
+```
+

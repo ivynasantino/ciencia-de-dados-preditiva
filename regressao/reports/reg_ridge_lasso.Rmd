@@ -7,14 +7,15 @@ output: html_notebook
 library(tidyverse)
 library(here)
 library(caret)
+
 theme_set(theme_minimal())
 ```
 
 Descrição do problema:
 
 - Usando todas as variáveis disponíveis, tune (usando validação cruzada): 
-  (i) um modelo de regressão Ridge
-  (ii) um modelo de regressão Lasso 
+  (i) um modelo de regressão Ridge ok
+  (ii) um modelo de regressão Lasso ok
   (iii) um modelo KNN. Para os modelos de regressão linear, o parâmetro a ser tunado é o lambda (penalização dos coeficientes) e o KNN o número de vizinhos. (9 pts.)
 
 - Compare os três modelos em termos do erro RMSE de validação cruzada. (9 pts.)
@@ -36,11 +37,20 @@ test = importa_eleicao("test.csv")
 ```{r, warning=FALSE, include=FALSE}
 train <- train %>% 
   select(-cargo,
-         -sequencial_candidato)
+         -sequencial_candidato,
+         -ocupacao,
+         -uf,
+         -nome)
 ```
 
 
 ```{r, warning=FALSE, include=FALSE}
+
+modelo_lm <- train(votos ~ .,
+                     data = train,
+                     method = "lm")
+
+
 modelo_ridge <- train(votos ~ .,
                      data = train,
                      method = "ridge")
@@ -51,4 +61,21 @@ modelo_lasso <- train(votos ~ .,
                      method = "lasso")
 
 ```
+
+
+```{r, warning=FALSE, include=FALSE}
+modelo_lm
+```
+
+
+```{r, warning=FALSE, include=FALSE}
+modelo_ridge
+```
+
+
+```{r, warning=FALSE, include=FALSE}
+modelo_lasso
+```
+
+
 

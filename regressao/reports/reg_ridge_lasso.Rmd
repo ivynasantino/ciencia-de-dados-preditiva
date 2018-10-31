@@ -60,6 +60,11 @@ modelo_lasso <- train(votos ~ .,
                      data = train,
                      method = "lasso")
 
+
+modelo_knn <- train(votos ~ .,
+                     data = train,
+                     method = "knn")
+
 ```
 
 
@@ -77,5 +82,8 @@ modelo_ridge
 modelo_lasso
 ```
 
+```{r, warning=FALSE, include=FALSE}
+modelo_knn
+```
 
 

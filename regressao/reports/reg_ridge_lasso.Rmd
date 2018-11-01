@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Predição de votação dos deputados"
 output: html_notebook
 ---
 
@@ -180,9 +180,133 @@ tot_receita = 0.6
 pes_juridica = 0.55
 
 escolha para modelo: 
+tot_desp
+qnt_forn
+qtd_doadores
+
+```{r, warning=FALSE, message=FALSE}
+train_select <- train %>% 
+  select(total_despesa,
+         quantidade_fornecedores,
+         quantidade_doadores,
+         votos)
+  
+```
+
+Fazendo modelos para os parâmetros escolhidos acima:
+
+```{r, warning=FALSE, message=FALSE}
+model_select_lm <- train(votos ~ .,
+                     data = train_select,
+                     method = "lm")
 
 
-```{r, warning=FALSE, include=FALSE}
+model_select_ridge <- train(votos ~ .,
+                     data = train_select,
+                     method = "ridge")
+
+
+model_select_lasso <- train(votos ~ .,
+                     data = train_select,
+                     method = "lasso")
+
+
+model_select_knn <- train(votos ~ .,
+                     data = train_select,
+                     method = "knn")
 
 ```
+
+```{r, warning=FALSE, message=FALSE}
+model_select_lm
+# 
+# Linear Regression 
+# 
+# 7476 samples
+#    3 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results:
+# 
+#   RMSE      Rsquared   MAE    
+#   37902.08  0.3787396  17553.9
+# 
+# Tuning parameter 'intercept' was held constant at a value of TRUE
+
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+model_select_ridge
+# 
+# Ridge Regression 
+# 
+# 7476 samples
+#    3 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results across tuning parameters:
+# 
+#   lambda  RMSE      Rsquared   MAE     
+#   0e+00   40162.91  0.3457245  17571.51
+#   1e-04   40163.12  0.3457225  17571.53
+#   1e-01   40533.98  0.3401296  17593.07
+# 
+# RMSE was used to select the optimal model using the smallest value.
+# The final value used for the model was lambda = 0.
+
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+model_select_lasso
+# 
+# The lasso 
+# 
+# 7476 samples
+#    3 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results across tuning parameters:
+# 
+#   fraction  RMSE      Rsquared   MAE     
+#   0.1       44482.84  0.3994785  26412.22
+#   0.5       37749.73  0.3851760  19367.70
+#   0.9       37920.64  0.3801250  17534.04
+# 
+# RMSE was used to select the optimal model using the smallest value.
+# The final value used for the model was fraction = 0.5.
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+model_select_knn
+# 
+# k-Nearest Neighbors 
+# 
+# 7476 samples
+#    3 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results across tuning parameters:
+# 
+#   k  RMSE      Rsquared   MAE     
+#   5  37954.12  0.4037610  14551.65
+#   7  36864.74  0.4240890  14151.26
+#   9  35728.96  0.4468599  13848.88
+# 
+# RMSE was used to select the optimal model using the smallest value.
+# The final value used for the model was k = 9.
+
+```
+
+
 

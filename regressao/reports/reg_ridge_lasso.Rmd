@@ -16,7 +16,7 @@ Descrição do problema:
 - Usando todas as variáveis disponíveis, tune (usando validação cruzada): 
   (i) um modelo de regressão Ridge ok
   (ii) um modelo de regressão Lasso ok
-  (iii) um modelo KNN. Para os modelos de regressão linear, o parâmetro a ser tunado é o lambda (penalização dos coeficientes) e o KNN o número de vizinhos. (9 pts.)
+  (iii) um modelo KNN. Para os modelos de regressão linear, o parâmetro a ser tunado é o lambda (penalização dos coeficientes) e o KNN o número de vizinhos. (9 pts.) ok
 
 - Compare os três modelos em termos do erro RMSE de validação cruzada. (9 pts.)
 - Quais as variáveis mais importantes segundo o modelo de regressão Ridge e Lasso?  Variáveis foram descartadas pelo Lasso? Quais? (9 pts.)
@@ -30,9 +30,13 @@ importa_eleicao <- function(dataset_path) {
   return(read)
 }
 
+```
+
+```{r, warning=FALSE, message=FALSE}
 train = importa_eleicao("train.csv")
 test = importa_eleicao("test.csv")
 ```
+
 
 
 ```{r, warning=FALSE, message=FALSE}

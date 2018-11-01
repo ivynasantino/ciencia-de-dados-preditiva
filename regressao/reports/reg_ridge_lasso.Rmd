@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-```{r setup, warning=FALSE, include=FALSE}
+```{r setup, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(here)
 library(caret)
@@ -24,7 +24,7 @@ Descrição do problema:
 - Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
 Links para um site externo (9 pts.)
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE}
 importa_eleicao <- function(dataset_path) {
   read = read_csv(here(paste("data/all", dataset_path, sep = "/")))
   return(read)
@@ -34,7 +34,8 @@ train = importa_eleicao("train.csv")
 test = importa_eleicao("test.csv")
 ```
 
-```{r, warning=FALSE, include=FALSE}
+
+```{r, warning=FALSE, message=FALSE}
 train <- train %>% 
   select(-cargo,
          -sequencial_candidato,
@@ -44,7 +45,7 @@ train <- train %>%
 ```
 
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE}
 
 modelo_lm <- train(votos ~ .,
                      data = train,
@@ -68,22 +69,120 @@ modelo_knn <- train(votos ~ .,
 ```
 
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE}
 modelo_lm
+
+# 
+# Linear Regression 
+# 
+# 7476 samples
+#   18 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results:
+# 
+#   RMSE      Rsquared   MAE     
+#   95680.41  0.3233439  17523.38
+# 
+# Tuning parameter 'intercept' was held constant at a value of TRUE
+
+
 ```
 
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE}
 modelo_ridge
+# 
+# Ridge Regression 
+# 
+# 7476 samples
+#   18 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results across tuning parameters:
+# 
+#   lambda  RMSE          Rsquared   MAE         
+#   0e+00   1.813757e+12  0.3355068  3.528742e+10
+#   1e-04   3.937651e+04  0.3651657  1.644839e+04
+#   1e-01   4.014603e+04  0.3592090  1.643595e+04
+# 
+# RMSE was used to select the optimal model using the smallest value.
+# The final value used for the model was lambda = 1e-04.
+
 ```
 
 
-```{r, warning=FALSE, include=FALSE}
+```{r, warning=FALSE, message=FALSE}
 modelo_lasso
+# 
+# The lasso 
+# 
+# 7476 samples
+#   18 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results across tuning parameters:
+# 
+#   fraction  RMSE      Rsquared   MAE     
+#   0.1       42667.20  0.3486232  17703.69
+#   0.5       65992.53  0.3013075  17097.56
+#   0.9       91408.60  0.2962026  17648.44
+# 
+# RMSE was used to select the optimal model using the smallest value.
+# The final value used for the model was fraction = 0.1.
+
 ```
+
+```{r, warning=FALSE, message=FALSE}
+modelo_knn
+# 
+# k-Nearest Neighbors 
+# 
+# 7476 samples
+#   18 predictor
+# 
+# No pre-processing
+# Resampling: Bootstrapped (25 reps) 
+# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
+# Resampling results across tuning parameters:
+# 
+#   k  RMSE      Rsquared   MAE     
+#   5  36436.60  0.4381170  13778.84
+#   7  35221.21  0.4650971  13295.98
+#   9  34604.39  0.4788859  13016.16
+# 
+# RMSE was used to select the optimal model using the smallest value.
+# The final value used for the model was k = 9.
+
+```
+
+
+Fazendo modelos com as variáveis escolhidas no checkpoint anterior:
+
+cola:
+
+qnt_fornec - qtd_desp = 0.99
+qnt_desp - tot_receita = 0.76
+pes_jur - tot-receita = 0.85
+pes_jur - tot_desp = 0.84
+tot_receita - tot_desp = 0.99
+qtd_doacoes - qtd_doadores = 1
+
+com votos
+tot_desp = 0.61
+tot_receita = 0.6
+pes_juridica = 0.55
+
+escolha para modelo: 
+
 
 ```{r, warning=FALSE, include=FALSE}
-modelo_knn
-```
 
+```
 

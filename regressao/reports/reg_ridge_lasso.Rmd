@@ -1,6 +1,15 @@
 ---
-title: "Predição de votação dos deputados"
-output: html_notebook
+title: "Predição de votação de candidatos à Câmara Federal de Deputados"
+author: "Ivyna Santino"
+date: "4 de novembro de 2018"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r setup, warning=FALSE, message=FALSE}
@@ -285,7 +294,6 @@ modelo_select_knn
 Resposta: comparação com o modelo anterior e dos novos RMSE.
 
 
-- Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
-Links para um site externo (9 pts.)
+### Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
 
 Dúvida

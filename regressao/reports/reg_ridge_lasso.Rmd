@@ -72,35 +72,33 @@ modelo_knn <- train(votos ~ .,
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_ridge
-# 
 # Ridge Regression 
 # 
 # 7476 samples
-#   18 predictor
+#   18 predictors
 # 
 # No pre-processing
 # Resampling: Bootstrapped (25 reps) 
 # Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
 # Resampling results across tuning parameters:
 # 
-#   lambda  RMSE          Rsquared   MAE         
-#   0e+00   1.813757e+12  0.3355068  3.528742e+10
-#   1e-04   3.937651e+04  0.3651657  1.644839e+04
-#   1e-01   4.014603e+04  0.3592090  1.643595e+04
+#   lambda  RMSE      Rsquared   MAE     
+#   0e+00   56515.38  0.3442496  16932.85
+#   1e-04   37477.05  0.3962081  16466.81
+#   1e-01   38050.98  0.3902056  16440.98
 # 
 # RMSE was used to select the optimal model using the smallest value.
 # The final value used for the model was lambda = 1e-04.
-
 ```
 
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_lasso
-# 
+
 # The lasso 
 # 
 # 7476 samples
-#   18 predictor
+#   18 predictors
 # 
 # No pre-processing
 # Resampling: Bootstrapped (25 reps) 
@@ -108,9 +106,9 @@ modelo_lasso
 # Resampling results across tuning parameters:
 # 
 #   fraction  RMSE      Rsquared   MAE     
-#   0.1       42667.20  0.3486232  17703.69
-#   0.5       65992.53  0.3013075  17097.56
-#   0.9       91408.60  0.2962026  17648.44
+#   0.1       41296.23  0.3360462  17264.30
+#   0.5       58228.20  0.2717016  16931.75
+#   0.9       78294.50  0.2600462  17345.89
 # 
 # RMSE was used to select the optimal model using the smallest value.
 # The final value used for the model was fraction = 0.1.
@@ -119,11 +117,11 @@ modelo_lasso
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_knn
-# 
+
 # k-Nearest Neighbors 
 # 
 # 7476 samples
-#   18 predictor
+#   18 predictors
 # 
 # No pre-processing
 # Resampling: Bootstrapped (25 reps) 
@@ -131,9 +129,9 @@ modelo_knn
 # Resampling results across tuning parameters:
 # 
 #   k  RMSE      Rsquared   MAE     
-#   5  36436.60  0.4381170  13778.84
-#   7  35221.21  0.4650971  13295.98
-#   9  34604.39  0.4788859  13016.16
+#   5  37343.24  0.4268117  13959.22
+#   7  35736.20  0.4583032  13460.61
+#   9  34970.26  0.4753359  13182.20
 # 
 # RMSE was used to select the optimal model using the smallest value.
 # The final value used for the model was k = 9.
@@ -147,7 +145,7 @@ ggplot(varImp(modelo_ridge)) +
 geom_col(fill = "#F08080") +
 labs(title = "Importância das variáveis do modelo Ridge",
      y = "Importância",
-     x = "Variável(s)")
+     x = "Variável(is)")
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -155,7 +153,7 @@ ggplot(varImp(modelo_lasso)) +
 geom_col(fill = "#FFA07A") +
 labs(title = "Importância das variáveis do modelo Lasso",
      y = "Importância",
-     x = "Variável(s)")
+     x = "Variável(is)")
 ```
 
 
@@ -164,13 +162,15 @@ ggplot(varImp(modelo_knn)) +
 geom_col(fill = "#F4A460") +
 labs(title = "Importância das variáveis do modelo Knn",
      y = "Importância",
-     x = "Variável(s)")
+     x = "Variável(is)")
   
 ```
 
 Selecionando as variáveis de acordo com os gráficos acima:
 
-total_receita, total_despesa, recursos_de_pessoas_juridicas
+- total_receita
+- total_despesa
+- recursos_de_pessoas_juridicas
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -212,9 +212,9 @@ modelo_select_ridge
 # Resampling results across tuning parameters:
 # 
 #   lambda  RMSE      Rsquared   MAE     
-#   0e+00   36943.41  0.3948709  17646.60
-#   1e-04   36943.18  0.3948734  17647.59
-#   1e-01   37192.25  0.3874505  17540.41
+#   0e+00   36295.67  0.3992942  17539.31
+#   1e-04   36295.39  0.3993021  17540.27
+#   1e-01   36538.17  0.3939808  17424.94
 # 
 # RMSE was used to select the optimal model using the smallest value.
 # The final value used for the model was lambda = 1e-04.

@@ -11,20 +11,14 @@ library(caret)
 theme_set(theme_minimal())
 ```
 
-Descrição do problema:
+### Descrição do problema:
+O objetivo desse checkpoint é construir modelos preditivos de regressão para a predição de votação de candidatos à Câmara Federal de Deputados.
 
-- Usando todas as variáveis disponíveis, tune (usando validação cruzada): 
-  (i) um modelo de regressão Ridge ok
-  (ii) um modelo de regressão Lasso ok
-  (iii) um modelo KNN. Para os modelos de regressão linear, o parâmetro a ser tunado é o lambda (penalização dos coeficientes) e o KNN o número de vizinhos. (9 pts.) ok
+### Iniciando
+#### Importando dados
+Antes de tudo, iremos importar os dados de treino e teste:
 
-- Compare os três modelos em termos do erro RMSE de validação cruzada. (9 pts.)
-- Quais as variáveis mais importantes segundo o modelo de regressão Ridge e Lasso?  Variáveis foram descartadas pelo Lasso? Quais? (9 pts.) ok
-- Re-treine o melhor modelo (usando os melhores valores de parâmetros encontrados em todos os dados, sem usar validação cruzada). (9 pts.) ok
-- Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
-Links para um site externo (9 pts.)
-
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, include=FALSE}
 importa_eleicao <- function(dataset_path) {
   read = read.csv(here(paste("data/all", dataset_path, sep = "/")))
   return(read)
@@ -37,8 +31,9 @@ train = importa_eleicao("train.csv")
 test = importa_eleicao("test.csv")
 ```
 
+#### Preparando dataframe:
 
-
+Nessa parte inicial, optei por retirar algumas variáveis contidas na base de dados afim de faciltar a criação dos modelos posteriormente.
 ```{r, warning=FALSE, message=FALSE}
 train <- train %>% 
   select(-cargo,
@@ -48,6 +43,11 @@ train <- train %>%
          -nome)
 ```
 
+### Criação dos modelos
+
+- Modelo de regressão Ridge
+- Modelo de regressão Lasso
+- Modelo KNN
 
 ```{r, warning=FALSE, message=FALSE}
 
@@ -138,7 +138,11 @@ modelo_knn
 
 ```
 
+### Comparação dos modelos em termos do erro RMSE
 
+Resposta
+
+### Importância das variáveis em modelos de regressão Ridge e Lasso
 
 ```{r, warning=FALSE, message=FALSE}
 ggplot(varImp(modelo_ridge)) +
@@ -166,12 +170,20 @@ labs(title = "Importância das variáveis do modelo Knn",
   
 ```
 
-Selecionando as variáveis de acordo com os gráficos acima:
+A partir das visualizações acima, podemos observar que as seguintes variáveis tem um maior nível de importância para o modelo:
 
 - total_receita
 - total_despesa
 - recursos_de_pessoas_juridicas
 
+Obs.: o critério de seleção das variáveis mais importantes se deu pelo nível de importância acima de 50.
+
+Dessa forma, podemos descartar recursos_de_pessoas_fisicas, quantidade_fornecedores, quantidade_despesas, media_receita, recursos_de_partido_politico, quantidade_doadores, quantidade_doacoes, grau, estado_civil, partido, sexo, ano, recursos_proprios, media_despesa e recursos_de_outros_candidatos.comites, deixando o modelo mais enxuto e possibilitando a construção de um novo modelo com menos variáveis e mais representativo.
+
+
+### Formando novo modelo
+
+Para formar um novo modelo, selecionei as variáveis com maior nível de importância de acordo com os resultados vistos acima e criei um novo dataframe.
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_select <- train %>% 
@@ -181,6 +193,7 @@ modelo_select <- train %>%
          votos)
 ```
 
+### Retreinando o melhor modelo
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_select_ridge <- train(votos ~ .,
@@ -269,25 +282,10 @@ modelo_select_knn
 
 ```
 
+Resposta: comparação com o modelo anterior e dos novos RMSE.
 
-Fazendo modelos com as variáveis escolhidas no checkpoint anterior:
 
-cola:
+- Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
+Links para um site externo (9 pts.)
 
-qnt_fornec - qtd_desp = 0.99
-qnt_desp - tot_receita = 0.76
-pes_jur - tot-receita = 0.85
-pes_jur - tot_desp = 0.84
-tot_receita - tot_desp = 0.99
-qtd_doacoes - qtd_doadores = 1
-
-com votos
-tot_desp = 0.61
-tot_receita = 0.6
-pes_juridica = 0.55
-
-escolha para modelo: 
-tot_desp
-qnt_forn
-qtd_doadores
-
+Dúvida

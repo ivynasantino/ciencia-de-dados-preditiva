@@ -12,7 +12,7 @@ output:
     toc_float: yes
 ---
 
-```{r setup, warning=FALSE, message=FALSE}
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
 library(tidyverse)
 library(here)
 library(caret)
@@ -67,7 +67,6 @@ modelo_ridge <- train(votos ~ .,
 
 modelo_lasso <- train(votos ~ .,
                      data = train,
-                     
                      method = "lasso")
 
 
@@ -81,75 +80,35 @@ modelo_knn <- train(votos ~ .,
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_ridge
-# Ridge Regression 
-# 
-# 7476 samples
-#   18 predictors
-# 
-# No pre-processing
-# Resampling: Bootstrapped (25 reps) 
-# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
-# Resampling results across tuning parameters:
-# 
-#   lambda  RMSE      Rsquared   MAE     
-#   0e+00   56515.38  0.3442496  16932.85
-#   1e-04   37477.05  0.3962081  16466.81
-#   1e-01   38050.98  0.3902056  16440.98
-# 
-# RMSE was used to select the optimal model using the smallest value.
-# The final value used for the model was lambda = 1e-04.
 ```
 
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_lasso
-
-# The lasso 
-# 
-# 7476 samples
-#   18 predictors
-# 
-# No pre-processing
-# Resampling: Bootstrapped (25 reps) 
-# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
-# Resampling results across tuning parameters:
-# 
-#   fraction  RMSE      Rsquared   MAE     
-#   0.1       41296.23  0.3360462  17264.30
-#   0.5       58228.20  0.2717016  16931.75
-#   0.9       78294.50  0.2600462  17345.89
-# 
-# RMSE was used to select the optimal model using the smallest value.
-# The final value used for the model was fraction = 0.1.
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 modelo_knn
-
-# k-Nearest Neighbors 
-# 
-# 7476 samples
-#   18 predictors
-# 
-# No pre-processing
-# Resampling: Bootstrapped (25 reps) 
-# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
-# Resampling results across tuning parameters:
-# 
-#   k  RMSE      Rsquared   MAE     
-#   5  37343.24  0.4268117  13959.22
-#   7  35736.20  0.4583032  13460.61
-#   9  34970.26  0.4753359  13182.20
-# 
-# RMSE was used to select the optimal model using the smallest value.
-# The final value used for the model was k = 9.
-
 ```
 
 ### Comparação dos modelos em termos do erro RMSE
 
-Resposta
+Para ficar mais fácil a observação dos valores mínimos, é mais intuitivo observar da seguinte forma:
+
+```{r, warning=FALSE, message=FALSE}
+min(modelo_ridge$results$RMSE)
+```
+
+```{r, warning=FALSE, message=FALSE}
+min(modelo_lasso$results$RMSE)
+```
+
+```{r, warning=FALSE, message=FALSE}
+min(modelo_knn$results$RMSE)
+```
+
+Dessa forma, podemos observar o modelo feito com o knn teve o menor resultado para o RMSE e o mais alto foi o método feito pelo lasso.
+
 
 ### Importância das variáveis em modelos de regressão Ridge e Lasso
 
@@ -205,14 +164,6 @@ modelo_select <- train %>%
 ### Retreinando o melhor modelo
 
 ```{r, warning=FALSE, message=FALSE}
-modelo_select_ridge <- train(votos ~ .,
-                     data = modelo_select,
-                     method = "ridge")
-
-modelo_select_lasso <- train(votos ~ .,
-                     data = modelo_select,
-                     method = "lasso")
-
 modelo_select_knn <- train(votos ~ .,
                      data = modelo_select,
                      method = "knn")
@@ -221,79 +172,49 @@ modelo_select_knn <- train(votos ~ .,
 
 
 ```{r, warning=FALSE, message=FALSE}
-modelo_select_ridge
-# 
-# Ridge Regression 
-# 
-# 7476 samples
-#    3 predictors
-# 
-# No pre-processing
-# Resampling: Bootstrapped (25 reps) 
-# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
-# Resampling results across tuning parameters:
-# 
-#   lambda  RMSE      Rsquared   MAE     
-#   0e+00   36295.67  0.3992942  17539.31
-#   1e-04   36295.39  0.3993021  17540.27
-#   1e-01   36538.17  0.3939808  17424.94
-# 
-# RMSE was used to select the optimal model using the smallest value.
-# The final value used for the model was lambda = 1e-04.
-
-```
-
-
-```{r, warning=FALSE, message=FALSE}
-modelo_select_lasso
-# 
-# The lasso 
-# 
-# 7476 samples
-#    3 predictors
-# 
-# No pre-processing
-# Resampling: Bootstrapped (25 reps) 
-# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
-# Resampling results across tuning parameters:
-# 
-#   fraction  RMSE     Rsquared   MAE     
-#   0.1       43632.6  0.3755933  24930.51
-#   0.5       37904.7  0.3789884  17850.19
-#   0.9       37816.1  0.3815954  17628.47
-# 
-# RMSE was used to select the optimal model using the smallest value.
-# The final value used for the model was fraction = 0.9.
-
-```
-
-
-```{r, warning=FALSE, message=FALSE}
 modelo_select_knn
-# 
-# k-Nearest Neighbors 
-# 
-# 7476 samples
-#    3 predictors
-# 
-# No pre-processing
-# Resampling: Bootstrapped (25 reps) 
-# Summary of sample sizes: 7476, 7476, 7476, 7476, 7476, 7476, ... 
-# Resampling results across tuning parameters:
-# 
-#   k  RMSE      Rsquared   MAE     
-#   5  37975.11  0.4046912  14366.88
-#   7  36573.01  0.4329369  13947.41
-#   9  35643.31  0.4509839  13642.85
-# 
-# RMSE was used to select the optimal model using the smallest value.
-# The final value used for the model was k = 9.
+```
+
+Da mesma forma do modelo anterior, é mais intuitivo observar o valor mínimo do RMSE abaixo:
+
+```{r, warning=FALSE, message=FALSE}
+min(modelo_select_knn$results$RMSE)
+```
+
+Podemos observar dessa vez que o valor do RMSE aumentou em comparação ao modelo com todas as variáveis.
+
+### Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle
+
+```{r, warning=FALSE, message=FALSE}
+submissao <- test %>% 
+  select(sequencial_candidato)
+
+test <- test %>% 
+  select(-cargo,
+         -sequencial_candidato,
+         -ocupacao,
+         -uf,
+         -nome)
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+predicao <- predict(modelo_select_knn, test)
+submissao$votos <- predicao
+
+submissao <- submissao %>% 
+  select(ID = sequencial_candidato,
+         votos = votos)
+```
+
+```{r, warning=FALSE, message=FALSE}
+write.csv(x = submissao,
+          file = "../data/sample_submission.csv",
+          row.names = FALSE)
+
 
 ```
 
-Resposta: comparação com o modelo anterior e dos novos RMSE.
 
 
-### Use esse último modelo treinado para prever os dados de teste disponíveis no challenge que criamos na plataforma Kaggle (Links para um site externo)
 
-Dúvida

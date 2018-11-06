@@ -21,7 +21,7 @@ theme_set(theme_minimal())
 ```
 
 ### Descrição do problema:
-O objetivo desse checkpoint é construir modelos preditivos de regressão para a predição de votação de candidatos à Câmara Federal de Deputados.
+O objetivo desse checkpoint é construir modelos de regressão para a predição de votação de candidatos à Câmara Federal de Deputados.
 
 ### Iniciando
 #### Importando dados
@@ -138,28 +138,28 @@ labs(title = "Importância das variáveis do modelo Knn",
   
 ```
 
-A partir das visualizações acima, podemos observar que as seguintes variáveis tem um maior nível de importância para o modelo:
+A partir das visualizações acima, podemos observar que as seguintes variáveis tem um menor nível de importância para o modelo:
 
-- total_receita
-- total_despesa
-- recursos_de_pessoas_juridicas
+- media_despesa
+- recursos_de_outros_candidatos.comites
+- recursos_proprios
 
-Obs.: o critério de seleção das variáveis mais importantes se deu pelo nível de importância acima de 50.
+Obs.: o critério de seleção das variáveis menos importantes se deu pelo nível de importância zero.
 
-Dessa forma, podemos descartar recursos_de_pessoas_fisicas, quantidade_fornecedores, quantidade_despesas, media_receita, recursos_de_partido_politico, quantidade_doadores, quantidade_doacoes, grau, estado_civil, partido, sexo, ano, recursos_proprios, media_despesa e recursos_de_outros_candidatos.comites, deixando o modelo mais enxuto e possibilitando a construção de um novo modelo com menos variáveis e mais representativo.
+Dessa forma, utilizei total_receita, total_despesa, recursos_de_pessoas_juridicas, recursos_de_pessoas_fisicas, quantidade_fornecedores, quantidade_despesas, media_receita, recursos_de_partido_politico, quantidade_doadores, quantidade_doacoes, grau, estado_civil, partido, sexo e ano, deixando o modelo mais enxuto e possibilitando a construção de um novo modelo com menos variáveis e mais representativo.
 
 
 ### Formando novo modelo
 
 Para formar um novo modelo, selecionei as variáveis com maior nível de importância de acordo com os resultados vistos acima e criei um novo dataframe.
 
-```{r, warning=FALSE, message=FALSE}
+```{r}
 modelo_select <- train %>% 
-  select(total_receita,
-         total_despesa,
-         recursos_de_pessoas_juridicas,
-         votos)
+  select(-media_despesa,
+         -recursos_de_outros_candidatos.comites,
+         -recursos_proprios)
 ```
+
 
 ### Retreinando o melhor modelo
 

@@ -16,6 +16,8 @@ Para esse checkpoint iremos utilizar conhecimentos sobre classificação para pr
 ```{r setup, warning=FALSE, message=FALSE, include=FALSE}
 library(tidyverse)
 library(here)
+library(caret)
+library(mlbench)
 
 theme_set(theme_minimal())
 ```
@@ -34,6 +36,10 @@ train = importa_eleicao("train.csv")
 test = importa_eleicao("test.csv")
 ```
 
+```{r, warning=FALSE, message=FALSE}
+
+```
+
 
 Perguntas:
 
@@ -44,8 +50,24 @@ Perguntas:
 
 
 ```{r, warning=FALSE, message=FALSE}
+quantidade_situacao <- table(train$situacao)
+```
+
+```{r, warning=FALSE, message=FALSE}
+nao_eleitos <- train %>% 
+  filter(situacao == "nao_eleito") %>% 
+  summarise(count = n())
+
+eleitos <- train %>%  
+  filter(situacao == "eleito") %>% 
+  summarise(count = n())
+
+todos <- rbind(nao_eleitos,
+               eleitos)
 
 ```
+
+
 
 2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. 
   Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  

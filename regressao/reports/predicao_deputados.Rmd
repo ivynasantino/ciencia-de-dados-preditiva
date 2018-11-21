@@ -1,0 +1,93 @@
+---
+title: "Predição de deputados eleitos"
+author: "Ivyna Santino"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+Para esse checkpoint iremos utilizar conhecimentos sobre classificação para prever quais candidatos à Câmara de Deputados serão eleitos nas eleições de 2014. 
+
+```{r setup, warning=FALSE, message=FALSE, include=FALSE}
+library(tidyverse)
+library(here)
+
+theme_set(theme_minimal())
+```
+
+```{r, warning=FALSE, message=FALSE, include=FALSE}
+importa_eleicao <- function(dataset_path) {
+  read = read.csv(here(paste("data/situacao", dataset_path, sep = "/")))
+  return(read)
+}
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+train = importa_eleicao("train.csv")
+test = importa_eleicao("test.csv")
+```
+
+
+Perguntas:
+
+1.Há desbalanceamento das classes (isto é, uma classe tem muito mais instâncias que outra)? 
+  Em que proporção? 
+  Quais efeitos colaterais o desbalanceamento de classes pode causar no classificador? 
+  Como você poderia tratar isso?
+
+
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. 
+  Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  
+
+
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+3.Reporte acurácia, precision, recall e f-measure no treino e validação. 
+  Há uma grande diferença de desempenho no treino/validação? 
+  Como você avalia os resultados? Justifique sua resposta.
+
+
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+4.Interprete as saídas dos modelos. 
+  Quais atributos parecem ser mais importantes de acordo com cada modelo? 
+  Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
+  
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+5.Envie seus melhores modelos à competição do Kaggle. 
+  Faça pelo menos uma submissão. 
+  Sugestões para melhorar o modelo: 
+    Experimente outros modelos (e.g. SVM, RandomForests e GradientBoosting).
+    Experimente balancear as classes,  caso estejam desbalanceadas.
+    Crie pelo menos um novo atributo.
+
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+
+
+
+
+
+
+

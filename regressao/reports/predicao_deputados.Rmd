@@ -37,7 +37,9 @@ test = importa_eleicao("test.csv")
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-
+train <- train %>% 
+  select(-cargo,
+         sequencial_candidato)
 ```
 
 
@@ -62,11 +64,16 @@ eleitos <- train %>%
   filter(situacao == "eleito") %>% 
   summarise(count = n())
 
-todos <- rbind(nao_eleitos,
+
+todos <- rbind.data.frame(nao_eleitos,
                eleitos)
 
 ```
 
+
+```{r, warning=FALSE, message=FALSE}
+
+```
 
 
 2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. 
@@ -74,7 +81,14 @@ todos <- rbind(nao_eleitos,
 
 
 ```{r, warning=FALSE, message=FALSE}
-
+VC <- trainControl(method = "cv",
+                   number = 5)
+#Erro: package e1071 is required
+modelo <- train(situacao ~ .,
+                data = train,
+                method = "glm",
+                family = "binomial",
+                trControl = VC)
 ```
 
 3.Reporte acurácia, precision, recall e f-measure no treino e validação. 

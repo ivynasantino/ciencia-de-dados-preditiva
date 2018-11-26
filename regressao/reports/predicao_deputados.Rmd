@@ -36,10 +36,26 @@ train = importa_eleicao("train.csv")
 test = importa_eleicao("test.csv")
 ```
 
+
 ```{r, warning=FALSE, message=FALSE}
 train <- train %>% 
   select(-cargo,
-         sequencial_candidato)
+         -sequencial_candidato,
+         -nome,
+         -uf,
+         -estado_civil,
+         -grau,
+         -ano,
+         -sexo,
+         -partido)
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+train$deputado <- ifelse(train$ocupacao == "DEPUTADO", TRUE, FALSE)
+
+train$deputado <- as.factor(train$deputado)
+
 ```
 
 
@@ -82,12 +98,12 @@ todos <- rbind.data.frame(nao_eleitos,
 
 ```{r, warning=FALSE, message=FALSE}
 VC <- trainControl(method = "cv",
-                   number = 5)
-#Erro: package e1071 is required
+                   number = 5,
+                   verboseIter = TRUE)
+
 modelo <- train(situacao ~ .,
                 data = train,
-                method = "glm",
-                family = "binomial",
+                method = "regLogistic",
                 trControl = VC)
 ```
 

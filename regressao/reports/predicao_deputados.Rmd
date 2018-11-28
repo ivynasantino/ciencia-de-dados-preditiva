@@ -107,6 +107,14 @@ modelo <- train(situacao ~ .,
                 trControl = VC)
 ```
 
+```{r, warning=FALSE, message=FALSE}
+modelo
+
+#saveRDS(modelo, file="modelo.rds")
+modelo <- readRDS(file="modelo.rds")
+```
+
+
 3.Reporte acurácia, precision, recall e f-measure no treino e validação. 
   Há uma grande diferença de desempenho no treino/validação? 
   Como você avalia os resultados? Justifique sua resposta.

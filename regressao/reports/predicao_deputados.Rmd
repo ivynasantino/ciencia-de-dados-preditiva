@@ -33,9 +33,13 @@ importa_eleicao <- function(dataset_path) {
 
 ```{r, message=FALSE, warning=FALSE}
 train = importa_eleicao("train.csv")
+```
+
+```{r, message=FALSE, warning=FALSE}
 test = importa_eleicao("test.csv")
 ```
 
+Tratando os dados:
 
 ```{r, warning=FALSE, message=FALSE}
 train <- train %>% 
@@ -50,14 +54,16 @@ train <- train %>%
          -partido)
 ```
 
+Seria bom tratar os dados numéricos com mediana, média...
 
 ```{r, warning=FALSE, message=FALSE}
-train$deputado <- ifelse(train$ocupacao == "DEPUTADO", TRUE, FALSE)
-
-train$deputado <- as.factor(train$deputado)
 
 ```
 
+
+```{r, warning=FALSE, message=FALSE}
+train$ocupacao <- as.factor(train$ocupacao)
+```
 
 Perguntas:
 
@@ -71,21 +77,6 @@ Perguntas:
 quantidade_situacao <- table(train$situacao)
 ```
 
-```{r, warning=FALSE, message=FALSE}
-nao_eleitos <- train %>% 
-  filter(situacao == "nao_eleito") %>% 
-  summarise(count = n())
-
-eleitos <- train %>%  
-  filter(situacao == "eleito") %>% 
-  summarise(count = n())
-
-
-todos <- rbind.data.frame(nao_eleitos,
-               eleitos)
-
-```
-
 
 ```{r, warning=FALSE, message=FALSE}
 
@@ -97,8 +88,9 @@ todos <- rbind.data.frame(nao_eleitos,
 
 
 ```{r, warning=FALSE, message=FALSE}
-VC <- trainControl(method = "cv",
+VC <- trainControl(method = "repeatedcv",
                    number = 5,
+                   repeats = 5,
                    verboseIter = TRUE)
 
 modelo <- train(situacao ~ .,
@@ -106,6 +98,7 @@ modelo <- train(situacao ~ .,
                 method = "regLogistic",
                 trControl = VC)
 ```
+
 
 ```{r, warning=FALSE, message=FALSE}
 modelo
@@ -131,6 +124,14 @@ modelo <- readRDS(file="modelo.rds")
 ```{r, warning=FALSE, message=FALSE}
 
 ```
+
+```{r, warning=FALSE, message=FALSE}
+train$deputado <- ifelse(train$ocupacao == "DEPUTADO", TRUE, FALSE)
+
+train$deputado <- as.factor(train$deputado)
+
+```
+
 
 5.Envie seus melhores modelos à competição do Kaggle. 
   Faça pelo menos uma submissão. 

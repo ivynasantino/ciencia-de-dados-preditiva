@@ -22,21 +22,13 @@ library(mlbench)
 theme_set(theme_minimal())
 ```
 
-```{r, warning=FALSE, message=FALSE, include=FALSE}
-importa_eleicao <- function(dataset_path) {
-  read = read.csv(here(paste("data/situacao", dataset_path, sep = "/")))
-  return(read)
-}
-
-```
-
 
 ```{r, message=FALSE, warning=FALSE}
 train <- read.csv(here("data/situacao/train.csv"))
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-test = importa_eleicao("test.csv")
+test = importa_eleicao("data/situacao/test.csv")
 ```
 
 Tratando os dados:
@@ -102,9 +94,24 @@ modelo <- train(situacao ~ .,
 
 ```{r, warning=FALSE, message=FALSE}
 modelo
+```
 
-saveRDS(modelo, file="modelo.rds")
+```{r, warning=FALSE, message=FALSE}
+#saveRDS(modelo, file="modelo.rds")
 modelo <- readRDS(file="modelo.rds")
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+VC <- trainControl(method = "repeatedcv",
+                   number = 5,
+                   repeats = 5,
+                   verboseIter = TRUE)
+
+modelo.knn <- train(situacao ~ .,
+                data = train,
+                method = "knn",
+                trControl = VC)
 ```
 
 

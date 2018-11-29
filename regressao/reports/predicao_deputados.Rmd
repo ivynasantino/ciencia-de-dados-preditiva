@@ -32,7 +32,7 @@ importa_eleicao <- function(dataset_path) {
 
 
 ```{r, message=FALSE, warning=FALSE}
-train = importa_eleicao("train.csv")
+train <- read.csv(here("data/situacao/train.csv"))
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -103,7 +103,7 @@ modelo <- train(situacao ~ .,
 ```{r, warning=FALSE, message=FALSE}
 modelo
 
-#saveRDS(modelo, file="modelo.rds")
+saveRDS(modelo, file="modelo.rds")
 modelo <- readRDS(file="modelo.rds")
 ```
 

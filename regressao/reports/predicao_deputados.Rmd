@@ -83,6 +83,7 @@ quantidade_situacao <- table(train$situacao)
 VC <- trainControl(method = "repeatedcv",
                    number = 5,
                    repeats = 5,
+                   sampling = "smote",
                    verboseIter = TRUE)
 
 modelo <- train(situacao ~ .,
@@ -97,23 +98,47 @@ modelo
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-#saveRDS(modelo, file="modelo.rds")
+saveRDS(modelo, file="modelo.rds")
 modelo <- readRDS(file="modelo.rds")
 ```
 
 
 ```{r, warning=FALSE, message=FALSE}
-VC <- trainControl(method = "repeatedcv",
-                   number = 5,
-                   repeats = 5,
-                   verboseIter = TRUE)
-
 modelo.knn <- train(situacao ~ .,
                 data = train,
                 method = "knn",
                 trControl = VC)
 ```
+```{r, warning=FALSE, message=FALSE}
+#saveRDS(modelo, file="modelo_knn.rds")
+modelo.knn <- readRDS(file="modelo_knn.rds")
+```
 
+
+```{r, warning=FALSE, message=FALSE}
+modelo.dt <- train(situacao ~ .,
+                data = train,
+                method = "rpart",
+                trControl = VC)
+```
+
+```{r, warning=FALSE, message=FALSE}
+#saveRDS(modelo, file="modelo_dt.rds")
+modelo_dt <- readRDS(file="modelo_dt.rds")
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+modelo.ada <- train(situacao ~ .,
+                data = train,
+                method = "adaboost",
+                trControl = VC)
+```
+
+```{r, warning=FALSE, message=FALSE}
+#saveRDS(modelo, file="modelo_ada.rds")
+modelo.ada <- readRDS(file="modelo_ada.rds")
+```
 
 3.Reporte acurácia, precision, recall e f-measure no treino e validação. 
   Há uma grande diferença de desempenho no treino/validação? 
@@ -129,14 +154,22 @@ modelo.knn <- train(situacao ~ .,
   Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
   
 ```{r, warning=FALSE, message=FALSE}
+train$homem <- ifelse(train$sexo == "HOMEM", TRUE, FALSE)
 
+train$homem <- as.factor(train$homem)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 train$deputado <- ifelse(train$ocupacao == "DEPUTADO", TRUE, FALSE)
 
 train$deputado <- as.factor(train$deputado)
+```
 
+
+```{r, warning=FALSE, message=FALSE}
+train$ens_superior <- ifelse(train$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
+
+train$ens_superior <- as.factor(train$ens_superior)
 ```
 
 

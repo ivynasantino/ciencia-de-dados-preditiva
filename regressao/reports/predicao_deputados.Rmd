@@ -70,62 +70,67 @@ quantidade_situacao <- table(train$situacao)
 ```
 
 
-```{r, warning=FALSE, message=FALSE}
-
-```
-
-
 2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. 
   Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  
 
 
 ```{r, warning=FALSE, message=FALSE}
-VC <- trainControl(method = "repeatedcv",
-                   number = 5,
-                   repeats = 5,
-                   sampling = "smote",
-                   verboseIter = TRUE)
-
-modelo <- train(situacao ~ .,
-                data = train,
-                method = "regLogistic",
-                trControl = VC)
+# VC <- trainControl(method = "repeatedcv",
+#                    number = 5,
+#                    repeats = 5,
+#                    sampling = "smote",
+#                    verboseIter = TRUE)
+# 
+# modelo <- train(situacao ~ .,
+#                 data = train,
+#                 method = "regLogistic",
+#                 trControl = VC)
 ```
 
+```{r, warning=FALSE, message=FALSE}
+#saveRDS(modelo, file="modelo.rds")
+modelo <- readRDS(file="modelo.rds")
+```
 
 ```{r, warning=FALSE, message=FALSE}
 modelo
 ```
 
+
 ```{r, warning=FALSE, message=FALSE}
-saveRDS(modelo, file="modelo.rds")
-modelo <- readRDS(file="modelo.rds")
+# modelo.knn <- train(situacao ~ .,
+#                 data = train,
+#                 method = "knn",
+#                 trControl = VC)
+```
+
+```{r, warning=FALSE, message=FALSE}
+modelo.knn
 ```
 
 
 ```{r, warning=FALSE, message=FALSE}
-modelo.knn <- train(situacao ~ .,
-                data = train,
-                method = "knn",
-                trControl = VC)
-```
-```{r, warning=FALSE, message=FALSE}
-#saveRDS(modelo, file="modelo_knn.rds")
+#saveRDS(modelo.knn, file="modelo_knn.rds")
 modelo.knn <- readRDS(file="modelo_knn.rds")
 ```
 
 
 ```{r, warning=FALSE, message=FALSE}
-modelo.dt <- train(situacao ~ .,
-                data = train,
-                method = "rpart",
-                trControl = VC)
+# modelo.dt <- train(situacao ~ .,
+#                 data = train,
+#                 method = "rpart",
+#                 trControl = VC)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-#saveRDS(modelo, file="modelo_dt.rds")
+#saveRDS(modelo.dt, file="modelo_dt.rds")
 modelo_dt <- readRDS(file="modelo_dt.rds")
 ```
+
+```{r, warning=FALSE, message=FALSE}
+modelo.dt
+```
+
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -136,8 +141,13 @@ modelo.ada <- train(situacao ~ .,
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-#saveRDS(modelo, file="modelo_ada.rds")
+#saveRDS(modelo.ada, file="modelo_ada.rds")
 modelo.ada <- readRDS(file="modelo_ada.rds")
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+modelo.ada
 ```
 
 3.Reporte acurácia, precision, recall e f-measure no treino e validação. 
@@ -152,7 +162,11 @@ modelo.ada <- readRDS(file="modelo_ada.rds")
 4.Interprete as saídas dos modelos. 
   Quais atributos parecem ser mais importantes de acordo com cada modelo? 
   Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
-  
+
+```{r, message=FALSE, warning=FALSE}
+train <- read.csv(here("data/situacao/train.csv"))
+```
+
 ```{r, warning=FALSE, message=FALSE}
 train$homem <- ifelse(train$sexo == "HOMEM", TRUE, FALSE)
 
@@ -170,6 +184,35 @@ train$deputado <- as.factor(train$deputado)
 train$ens_superior <- ifelse(train$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
 
 train$ens_superior <- as.factor(train$ens_superior)
+```
+
+```{r, warning=FALSE, message=FALSE}
+train <- train %>% 
+  select(-cargo,
+         -sequencial_candidato,
+         -nome,
+         -uf,
+         -estado_civil,
+         -grau,
+         -ano,
+         -sexo,
+         -partido)
+```
+
+```{r, warning=FALSE, message=FALSE}
+modelo.ada.novo <- train(situacao ~ .,
+                data = train,
+                method = "adaboost",
+                trControl = VC)
+```
+
+```{r, warning=FALSE, message=FALSE}
+#saveRDS(modelo.ada.novo, file="modelo_ada_novo.rds")
+modelo.ada.novo <- readRDS(file="modelo_ada_novo.rds")
+```
+
+```{r, warning=FALSE, message=FALSE}
+modelo.ada.novo
 ```
 
 

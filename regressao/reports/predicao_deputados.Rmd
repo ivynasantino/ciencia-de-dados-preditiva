@@ -292,9 +292,6 @@ train_novo$ens_superior <- ifelse(train_novo$grau == "SUPERIOR COMPLETO", TRUE, 
 train_novo$ens_superior <- as.factor(train_novo$ens_superior)
 ```
 
-```{r, warning=FALSE, message=FALSE}
-train$ocupacao <- as.factor(train$ocupacao)
-```
 
 ```{r, warning=FALSE, message=FALSE}
 train_novo <- train_novo %>% 
@@ -367,14 +364,48 @@ test = read.csv(here("data/situacao/test.csv"))
 ```
 
 ```{r, warning=FALSE, message=FALSE}
+submissao <- test %>% 
+  select(sequencial_candidato)
 
 ```
 
+```{r, warning=FALSE, message=FALSE}
+test$gastos <- test$total_receita - test$total_despesa
+
+test$deputado <- ifelse(test$ocupacao == "DEPUTADO", TRUE, FALSE)
+test$deputado <- as.factor(test$deputado)
+
+test$ens_superior <- ifelse(test$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
+test$ens_superior <- as.factor(test$ens_superior)
+
+test <- test %>% 
+  select(-cargo,
+         -sequencial_candidato,
+         -nome,
+         -uf,
+         -estado_civil,
+         -grau,
+         -ano,
+         -sexo,
+         -partido,
+         -ocupacao)
+```
+
+```{r, warning=FALSE, message=FALSE}
+predicao <- predict(modelo.ada.novo, test)
+submissao$situacao <- predicao
+
+submissao <- submissao %>% 
+  select(ID = sequencial_candidato,
+         situacao = situacao)
+```
+
+```{r, warning=FALSE, message=FALSE}
+write.csv(x = submissao,
+          file = "../data/situacao/submissao.csv",
+          row.names = FALSE)
 
 
-
-
-
-
+```
 
 

@@ -26,11 +26,6 @@ theme_set(theme_minimal())
 ```{r, message=FALSE, warning=FALSE}
 train <- read.csv(here("data/situacao/train.csv"))
 ```
-
-```{r, message=FALSE, warning=FALSE}
-test = read.csv(here("data/situacao/test.csv"))
-```
-
 Tratando os dados:
 
 ```{r, warning=FALSE, message=FALSE}
@@ -130,7 +125,7 @@ modelo.dt <- readRDS(file="modelo_dt.rds")
 ```{r, warning=FALSE, message=FALSE}
 modelo.dt
 ```
-```{r}
+```{r, warning=FALSE, message=FALSE}
 confusion.dt <- confusionMatrix(modelo.dt)
 confusion.dt
 ```
@@ -154,18 +149,17 @@ modelo.ada
 ```
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 confusion.ada <- confusionMatrix(modelo.ada)
 confusion.ada
 ```
 
-
 ### 3.Reporte acurácia, precision, recall e f-measure no treino e validação. Há uma grande diferença de desempenho no treino/validação? Como você avalia os resultados? Justifique sua resposta.
 
-vp: verdadeiros positivos table1
-fp: falsos positivos table3
-vn: verdadeiros negativos table2
-fn: falsos negativos table4
+vp: verdadeiros positivos table[1]
+fp: falsos positivos table[3]
+vn: verdadeiros negativos table[2]
+fn: falsos negativos table[4]
 
 ```{r, warning=FALSE, message=FALSE}
 precision <- function(vp, fp) {
@@ -269,35 +263,36 @@ acuracia.ada
 [RESPOSTA]
 
 
-4.Interprete as saídas dos modelos. 
-  Quais atributos parecem ser mais importantes de acordo com cada modelo? 
-  Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
+### 4.Interprete as saídas dos modelos. Quais atributos parecem ser mais importantes de acordo com cada modelo? Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
 
 ```{r, message=FALSE, warning=FALSE}
-train <- read.csv(here("data/situacao/train.csv"))
+train_novo <- read.csv(here("data/situacao/train.csv"))
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-train$homem <- ifelse(train$sexo == "HOMEM", TRUE, FALSE)
+train_novo$homem <- ifelse(train_novo$sexo == "HOMEM", TRUE, FALSE)
 
-train$homem <- as.factor(train$homem)
+train_novo$homem <- as.factor(train_novo$homem)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-train$deputado <- ifelse(train$ocupacao == "DEPUTADO", TRUE, FALSE)
+train_novo$deputado <- ifelse(train_novo$ocupacao == "DEPUTADO", TRUE, FALSE)
 
-train$deputado <- as.factor(train$deputado)
-```
-
-
-```{r, warning=FALSE, message=FALSE}
-train$ens_superior <- ifelse(train$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
-
-train$ens_superior <- as.factor(train$ens_superior)
+train_novo$deputado <- as.factor(train_novo$deputado)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-train <- train %>% 
+train_novo$ens_superior <- ifelse(train_novo$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
+
+train_novo$ens_superior <- as.factor(train_novo$ens_superior)
+```
+
+```{r, warning=FALSE, message=FALSE}
+train_novo$ocupacao <- as.factor(train_novo$ocupacao)
+```
+
+```{r, warning=FALSE, message=FALSE}
+train_novo <- train_novo %>% 
   select(-cargo,
          -sequencial_candidato,
          -nome,
@@ -309,9 +304,20 @@ train <- train %>%
          -partido)
 ```
 
+2 melhores modelos: dt e ada.
+
+
+```{r, warning=FALSE, message=FALSE}
+modelo.dt.novo <- train(situacao ~ .,
+                data = train_novo,
+                method = "rpart",
+                trControl = VC)
+```
+
+
 ```{r, warning=FALSE, message=FALSE}
 modelo.ada.novo <- train(situacao ~ .,
-                data = train,
+                data = train_novo,
                 method = "adaboost",
                 trControl = VC)
 ```
@@ -332,6 +338,10 @@ modelo.ada.novo
     Experimente outros modelos (e.g. SVM, RandomForests e GradientBoosting).
     Experimente balancear as classes,  caso estejam desbalanceadas.
     Crie pelo menos um novo atributo.
+
+```{r, message=FALSE, warning=FALSE}
+test = read.csv(here("data/situacao/test.csv"))
+```
 
 ```{r, warning=FALSE, message=FALSE}
 

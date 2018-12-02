@@ -17,7 +17,7 @@ Para esse checkpoint iremos utilizar conhecimentos sobre classificação para pr
 library(tidyverse)
 library(here)
 library(caret)
-library(mlbench)
+library(rpart)
 
 theme_set(theme_minimal())
 ```
@@ -28,7 +28,7 @@ train <- read.csv(here("data/situacao/train.csv"))
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-test = importa_eleicao("data/situacao/test.csv")
+test = read.csv(here("data/situacao/test.csv"))
 ```
 
 Tratando os dados:
@@ -46,12 +46,6 @@ train <- train %>%
          -partido)
 ```
 
-Seria bom tratar os dados numéricos com mediana, média...
-
-```{r, warning=FALSE, message=FALSE}
-
-```
-
 
 ```{r, warning=FALSE, message=FALSE}
 train$ocupacao <- as.factor(train$ocupacao)
@@ -59,19 +53,16 @@ train$ocupacao <- as.factor(train$ocupacao)
 
 Perguntas:
 
-1.Há desbalanceamento das classes (isto é, uma classe tem muito mais instâncias que outra)? 
-  Em que proporção? 
-  Quais efeitos colaterais o desbalanceamento de classes pode causar no classificador? 
-  Como você poderia tratar isso?
+###1.Há desbalanceamento das classes (isto é, uma classe tem muito mais instâncias que outra)? Em que proporção? Quais efeitos colaterais o desbalanceamento de classes pode causar no classificador? Como você poderia tratar isso?
 
 
 ```{r, warning=FALSE, message=FALSE}
 quantidade_situacao <- table(train$situacao)
+quantidade_situacao
 ```
+[RESPOSTAS]
 
-
-2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. 
-  Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  
+### 2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -95,6 +86,10 @@ modelo <- readRDS(file="modelo.rds")
 ```{r, warning=FALSE, message=FALSE}
 modelo
 ```
+```{r, warning=FALSE, message=FALSE}
+confusion.rl <- confusionMatrix(modelo)
+confusion.rl
+```
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -114,6 +109,11 @@ modelo.knn
 modelo.knn <- readRDS(file="modelo_knn.rds")
 ```
 
+```{r, warning=FALSE, message=FALSE}
+confusion.knn <- confusionMatrix(modelo.knn)
+confusion.knn
+```
+
 
 ```{r, warning=FALSE, message=FALSE}
 # modelo.dt <- train(situacao ~ .,
@@ -124,20 +124,23 @@ modelo.knn <- readRDS(file="modelo_knn.rds")
 
 ```{r, warning=FALSE, message=FALSE}
 #saveRDS(modelo.dt, file="modelo_dt.rds")
-modelo_dt <- readRDS(file="modelo_dt.rds")
+modelo.dt <- readRDS(file="modelo_dt.rds")
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 modelo.dt
 ```
-
+```{r}
+confusion.dt <- confusionMatrix(modelo.dt)
+confusion.dt
+```
 
 
 ```{r, warning=FALSE, message=FALSE}
-modelo.ada <- train(situacao ~ .,
-                data = train,
-                method = "adaboost",
-                trControl = VC)
+# modelo.ada <- train(situacao ~ .,
+#                 data = train,
+#                 method = "adaboost",
+#                 trControl = VC)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -150,14 +153,121 @@ modelo.ada <- readRDS(file="modelo_ada.rds")
 modelo.ada
 ```
 
-3.Reporte acurácia, precision, recall e f-measure no treino e validação. 
-  Há uma grande diferença de desempenho no treino/validação? 
-  Como você avalia os resultados? Justifique sua resposta.
 
+```{r}
+confusion.ada <- confusionMatrix(modelo.ada)
+confusion.ada
+```
+
+
+### 3.Reporte acurácia, precision, recall e f-measure no treino e validação. Há uma grande diferença de desempenho no treino/validação? Como você avalia os resultados? Justifique sua resposta.
+
+vp: verdadeiros positivos table1
+fp: falsos positivos table3
+vn: verdadeiros negativos table2
+fn: falsos negativos table4
 
 ```{r, warning=FALSE, message=FALSE}
+precision <- function(vp, fp) {
+  resultado = vp/(vp + fp)
+  return(resultado)
+}
 
+recall <- function(vp, fn) {
+  resultado = vp/(vp + fn)
+  return(resultado)
+}
+
+f_measure <- function(p, r) {
+  resultado = 2*((p * r)/(p + r))
+  return(resultado)
+}
+
+acuracia <- function(vp, fp, vn, fn) {
+  resultado = (vp + fn)/(vp + fp + vn + fn)
+  return(resultado)
+}
 ```
+
+
+#### Regressão logística
+
+```{r, warning=FALSE, message=FALSE}
+precision.rl <- precision(confusion.rl$table[1], confusion.rl$table[3])
+recall.rl <- recall(confusion.rl$table[1], confusion.rl$table[2])
+f_measure.rl <- f_measure(precision.rl, recall.rl)
+acuracia.rl <- acuracia(confusion.rl$table[1], 
+                        confusion.rl$table[3], 
+                        confusion.rl$table[2], 
+                        confusion.rl$table[4])
+```
+
+```{r, warning=FALSE, message=FALSE}
+precision.rl
+recall.rl
+f_measure.rl
+acuracia.rl
+```
+
+#### Knn
+
+```{r, warning=FALSE, message=FALSE}
+precision.knn <- precision(confusion.knn$table[1], confusion.knn$table[3])
+recall.knn <- recall(confusion.knn$table[1], confusion.knn$table[2])
+f_measure.knn <- f_measure(precision.knn, recall.knn)
+acuracia.knn <- acuracia(confusion.knn$table[1], 
+                        confusion.knn$table[3], 
+                        confusion.knn$table[2], 
+                        confusion.knn$table[4])
+```
+
+```{r, warning=FALSE, message=FALSE}
+precision.knn
+recall.knn
+f_measure.knn
+acuracia.knn
+```
+
+#### Árvore de decisão
+
+```{r, warning=FALSE, message=FALSE}
+precision.dt <- precision(confusion.dt$table[1], confusion.dt$table[3])
+recall.dt <- recall(confusion.dt$table[1], confusion.dt$table[2])
+f_measure.dt <- f_measure(precision.dt, recall.dt)
+acuracia.dt <- acuracia(confusion.dt$table[1], 
+                        confusion.dt$table[3], 
+                        confusion.dt$table[2], 
+                        confusion.dt$table[4])
+```
+
+```{r, warning=FALSE, message=FALSE}
+precision.dt
+recall.dt
+f_measure.dt
+acuracia.dt
+```
+
+#### Adaboost
+
+```{r, warning=FALSE, message=FALSE}
+precision.ada <- precision(confusion.ada$table[1], confusion.ada$table[3])
+recall.ada <- recall(confusion.ada$table[1], confusion.ada$table[2])
+f_measure.ada <- f_measure(precision.ada, recall.ada)
+acuracia.ada <- acuracia(confusion.ada$table[1], 
+                        confusion.ada$table[3], 
+                        confusion.ada$table[2], 
+                        confusion.ada$table[4])
+```
+
+```{r, warning=FALSE, message=FALSE}
+precision.ada
+recall.ada
+f_measure.ada
+acuracia.ada
+```
+
+[RESPOSTA]
+
 
 4.Interprete as saídas dos modelos. 
   Quais atributos parecem ser mais importantes de acordo com cada modelo? 

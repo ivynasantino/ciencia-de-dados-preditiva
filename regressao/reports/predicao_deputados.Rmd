@@ -176,10 +176,11 @@ confusion.ada
 
 ### 3.Reporte acurácia, precision, recall e f-measure no treino e validação. Há uma grande diferença de desempenho no treino/validação? Como você avalia os resultados? Justifique sua resposta.
 
-vp: verdadeiros positivos - table[1]
-fp: falsos positivos - table[3]
-vn: verdadeiros negativos - table[2]
-fn: falsos negativos - table[4]
+Sumário das variáveis:
+  vp: verdadeiros positivos - table[1]
+  fp: falsos positivos - table[3]
+  vn: verdadeiros negativos - table[2]
+  fn: falsos negativos - table[4]
 
 ```{r, warning=FALSE, message=FALSE}
 precision <- function(vp, fp) {
@@ -203,6 +204,13 @@ acuracia <- function(vp, fp, vn, fn) {
 }
 ```
 
+
+Obs.: O que significa cada parâmentro modularizado acima:
+
+  - Precision: proporção de predições positivas que são realmente positivas.
+  - Recall: proporção de predições que foram corretamente classificadas.
+  - F_measure:
+  - Acurácia: proporção de predições corretamente classificadas, também é dada pela matriz de confusão calculada nos passos anteriores.
 
 #### Regressão logística
 
@@ -285,18 +293,26 @@ acuracia.ada
 
 ### 4.Interprete as saídas dos modelos. Quais atributos parecem ser mais importantes de acordo com cada modelo? Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
 
+Para definirmos qual atributo criar, vamos observar qual a importância de cada um no modelo.
+
 ```{r, warning=FALSE, message=FALSE}
 varImp(modelo.dt)
 ```
 
+Assim como nos checkpoints anteriores, podemos ver que total_receita e total_despesa tiveram resultados bem altos. Então que tal criarmos uma variável de gastos através da diferença entre receita e despesa?  
 
+Antes disso, criei um novo dataframe com os dados de treino.
 ```{r, message=FALSE, warning=FALSE}
 train_novo <- read.csv(here("data/situacao/train.csv"))
 ```
 
+Criando atributos:
+
 ```{r, warning=FALSE, message=FALSE}
 train_novo$gastos <- train_novo$total_receita - train_novo$total_despesa
 ```
+
+Além dos gastos, acredito que parlamentares que já são deputados tem vantagens para serem eleitos novamente, dessa maneira criei um atributo que verifica se o candidato tem como ocupação deputado ou não.
 
 ```{r, warning=FALSE, message=FALSE}
 train_novo$deputado <- ifelse(train_novo$ocupacao == "DEPUTADO", TRUE, FALSE)
@@ -304,12 +320,14 @@ train_novo$deputado <- ifelse(train_novo$ocupacao == "DEPUTADO", TRUE, FALSE)
 train_novo$deputado <- as.factor(train_novo$deputado)
 ```
 
+Outra característica que acredito que faça influência é se o candidato tem ensino superior.
 ```{r, warning=FALSE, message=FALSE}
 train_novo$ens_superior <- ifelse(train_novo$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
 
 train_novo$ens_superior <- as.factor(train_novo$ens_superior)
 ```
 
+Como os atributos que criei, em maioria, são categóricos tive que transformá-los em fator também. Da mesma forma que fiz anteriormente, retirei as colunas com parâmentros categóricos e dessa vez retirei mais um atributo(ocupação), por dois motivos: como era categórica e mesmo transformando em fator, no momento de rodar as regressões ficava muito demorado e o Rstudio acabava fechando e o outro motivo é que fiz a coluna deputado.
 
 ```{r, warning=FALSE, message=FALSE}
 train_novo <- train_novo %>% 
@@ -325,7 +343,9 @@ train_novo <- train_novo %>%
          -ocupacao)
 ```
 
-2 melhores modelos: dt e ada.
+Escolhi os dois melhores modelos de acordo com os resultados anteriores: árvore de decisão e o adaboost.
+
+#### Árvore de decisão
 
 ```{r, warning=FALSE, message=FALSE}
 # modelo.dt.novo <- train(situacao ~ .,
@@ -348,6 +368,7 @@ confusion.dt.novo <- confusionMatrix(modelo.dt.novo)
 confusion.dt.novo
 ```
 
+#### Adaboost
 
 ```{r, warning=FALSE, message=FALSE}
 # modelo.ada.novo <- train(situacao ~ .,
@@ -370,12 +391,14 @@ confusion.ada.novo <- confusionMatrix(modelo.ada.novo)
 confusion.ada.novo
 ```
 
-5.Envie seus melhores modelos à competição do Kaggle. 
-  Faça pelo menos uma submissão. 
-  Sugestões para melhorar o modelo: 
-    Experimente outros modelos (e.g. SVM, RandomForests e GradientBoosting).
-    Experimente balancear as classes,  caso estejam desbalanceadas.
-    Crie pelo menos um novo atributo.
+Como podemos ver nossos modelos tiveram uma leve queda na acurácia, acredito que seja pelo fator da retirada do atributo de ocupação. Mas ainda continuam modelos muito bons.
+
+### 5.Envie seus melhores modelos à competição do Kaggle. Faça pelo menos uma submissão. 
+  
+Sugestões para melhorar o modelo: 
+  Experimente outros modelos (e.g. SVM, RandomForests e GradientBoosting).
+  Experimente balancear as classes,  caso estejam desbalanceadas.
+  Crie pelo menos um novo atributo.
 
 ```{r, message=FALSE, warning=FALSE}
 test = read.csv(here("data/situacao/test.csv"))

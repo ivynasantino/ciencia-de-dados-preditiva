@@ -11,6 +11,7 @@ output:
     toc_float: yes
 ---
 
+### Introdução
 Para esse checkpoint iremos utilizar conhecimentos sobre classificação para prever quais candidatos à Câmara de Deputados serão eleitos nas eleições de 2014. 
 
 ```{r setup, warning=FALSE, message=FALSE, include=FALSE}
@@ -22,11 +23,13 @@ library(rpart)
 theme_set(theme_minimal())
 ```
 
-
+Importando os dados de treino:
 ```{r, message=FALSE, warning=FALSE}
 train <- read.csv(here("data/situacao/train.csv"))
 ```
 Tratando os dados:
+
+Para essa etapa, retirei a maioria das variáveis categóricas dos dados de treino. O único parâmetro categórico que permaneceu no nosso dataframe foi o de ocupação, que posteriomente foi transformado em fator para que possamos realizar as operações de regressão.
 
 ```{r, warning=FALSE, message=FALSE}
 train <- train %>% 
@@ -46,34 +49,47 @@ train <- train %>%
 train$ocupacao <- as.factor(train$ocupacao)
 ```
 
-Perguntas:
-
-###1.Há desbalanceamento das classes (isto é, uma classe tem muito mais instâncias que outra)? Em que proporção? Quais efeitos colaterais o desbalanceamento de classes pode causar no classificador? Como você poderia tratar isso?
+### 1.Há desbalanceamento das classes (isto é, uma classe tem muito mais instâncias que outra)? Em que proporção? Quais efeitos colaterais o desbalanceamento de classes pode causar no classificador? Como você poderia tratar isso?
 
 
 ```{r, warning=FALSE, message=FALSE}
 quantidade_situacao <- table(train$situacao)
 quantidade_situacao
 ```
-[RESPOSTAS]
+
+```{r, warning=FALSE, message=FALSE}
+proporcaoEleito <- quantidade_situacao[1]/(quantidade_situacao[1] + quantidade_situacao[2])
+proporcaoEleito
+```
+```{r, warning=FALSE, message=FALSE}
+proporcaoNEleito <- quantidade_situacao[2]/(quantidade_situacao[1] + quantidade_situacao[2])
+proporcaoNEleito
+```
+
+Temos um desbalanceamento dos dados com relação a quantidade de parlamentares eleitos e não eleitos, como podemos ver acima, com proporção de 13% para eleitos e 86% para não eleitos. Dessa maneira, com este cenário de desbalanceamento de classes o nosso classificador poderá dar resultados mais precisos para classes com maior proporção e errar quanto aos resultados das classes que possuem menor proporção de dados. Por isso, podemos tratar isso com parâmentros de balanceamento na validação cruzada. 
 
 ### 2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  
 
+#### Validação cruzada
 
 ```{r, warning=FALSE, message=FALSE}
-# VC <- trainControl(method = "repeatedcv",
+#VC <- trainControl(method = "repeatedcv",
 #                    number = 5,
 #                    repeats = 5,
 #                    sampling = "smote",
 #                    verboseIter = TRUE)
-# 
+```
+
+#### Regressão logística
+
+```{r, warning=FALSE, message=FALSE}
 # modelo <- train(situacao ~ .,
 #                 data = train,
 #                 method = "regLogistic",
 #                 trControl = VC)
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, include=FALSE}
 #saveRDS(modelo, file="modelo.rds")
 modelo <- readRDS(file="modelo.rds")
 ```
@@ -87,6 +103,7 @@ confusion.rl <- confusionMatrix(modelo)
 confusion.rl
 ```
 
+#### Knn
 
 ```{r, warning=FALSE, message=FALSE}
 # modelo.knn <- train(situacao ~ .,
@@ -100,7 +117,7 @@ modelo.knn
 ```
 
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, include=FALSE}
 #saveRDS(modelo.knn, file="modelo_knn.rds")
 modelo.knn <- readRDS(file="modelo_knn.rds")
 ```
@@ -110,6 +127,7 @@ confusion.knn <- confusionMatrix(modelo.knn)
 confusion.knn
 ```
 
+#### Árvore de decisão
 
 ```{r, warning=FALSE, message=FALSE}
 # modelo.dt <- train(situacao ~ .,
@@ -118,7 +136,7 @@ confusion.knn
 #                 trControl = VC)
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, include=FALSE}
 #saveRDS(modelo.dt, file="modelo_dt.rds")
 modelo.dt <- readRDS(file="modelo_dt.rds")
 ```
@@ -131,7 +149,7 @@ modelo.dt
 confusion.dt <- confusionMatrix(modelo.dt)
 confusion.dt
 ```
-
+#### Adaboost
 
 ```{r, warning=FALSE, message=FALSE}
 # modelo.ada <- train(situacao ~ .,
@@ -140,7 +158,7 @@ confusion.dt
 #                 trControl = VC)
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, include=FALSE}
 #saveRDS(modelo.ada, file="modelo_ada.rds")
 modelo.ada <- readRDS(file="modelo_ada.rds")
 ```
@@ -158,10 +176,10 @@ confusion.ada
 
 ### 3.Reporte acurácia, precision, recall e f-measure no treino e validação. Há uma grande diferença de desempenho no treino/validação? Como você avalia os resultados? Justifique sua resposta.
 
-vp: verdadeiros positivos table[1]
-fp: falsos positivos table[3]
-vn: verdadeiros negativos table[2]
-fn: falsos negativos table[4]
+vp: verdadeiros positivos - table[1]
+fp: falsos positivos - table[3]
+vn: verdadeiros negativos - table[2]
+fn: falsos negativos - table[4]
 
 ```{r, warning=FALSE, message=FALSE}
 precision <- function(vp, fp) {

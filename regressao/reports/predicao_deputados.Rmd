@@ -313,14 +313,14 @@ train_novo <- train_novo %>%
 2 melhores modelos: dt e ada.
 
 ```{r, warning=FALSE, message=FALSE}
-modelo.dt.novo <- train(situacao ~ .,
-                data = train_novo,
-                method = "rpart",
-                trControl = VC)
+# modelo.dt.novo <- train(situacao ~ .,
+#                 data = train_novo,
+#                 method = "rpart",
+#                 trControl = VC)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-saveRDS(modelo.dt.novo, file="modelo_dt_novo.rds")
+#saveRDS(modelo.dt.novo, file="modelo_dt_novo.rds")
 modelo.dt.novo <- readRDS(file="modelo_dt_novo.rds")
 ```
 
@@ -335,10 +335,10 @@ confusion.dt.novo
 
 
 ```{r, warning=FALSE, message=FALSE}
-modelo.ada.novo <- train(situacao ~ .,
-                data = train_novo,
-                method = "adaboost",
-                trControl = VC)
+# modelo.ada.novo <- train(situacao ~ .,
+#                 data = train_novo,
+#                 method = "adaboost",
+#                 trControl = VC)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -348,6 +348,11 @@ modelo.ada.novo <- readRDS(file="modelo_ada_novo.rds")
 
 ```{r, warning=FALSE, message=FALSE}
 modelo.ada.novo
+```
+
+```{r, warning=FALSE, message=FALSE}
+confusion.ada.novo <- confusionMatrix(modelo.ada.novo)
+confusion.ada.novo
 ```
 
 5.Envie seus melhores modelos à competição do Kaggle. 

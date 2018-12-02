@@ -81,6 +81,7 @@ modelo <- readRDS(file="modelo.rds")
 ```{r, warning=FALSE, message=FALSE}
 modelo
 ```
+
 ```{r, warning=FALSE, message=FALSE}
 confusion.rl <- confusionMatrix(modelo)
 confusion.rl
@@ -125,6 +126,7 @@ modelo.dt <- readRDS(file="modelo_dt.rds")
 ```{r, warning=FALSE, message=FALSE}
 modelo.dt
 ```
+
 ```{r, warning=FALSE, message=FALSE}
 confusion.dt <- confusionMatrix(modelo.dt)
 confusion.dt
@@ -265,14 +267,17 @@ acuracia.ada
 
 ### 4.Interprete as saídas dos modelos. Quais atributos parecem ser mais importantes de acordo com cada modelo? Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
 
+```{r, warning=FALSE, message=FALSE}
+varImp(modelo.dt)
+```
+
+
 ```{r, message=FALSE, warning=FALSE}
 train_novo <- read.csv(here("data/situacao/train.csv"))
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-train_novo$homem <- ifelse(train_novo$sexo == "HOMEM", TRUE, FALSE)
-
-train_novo$homem <- as.factor(train_novo$homem)
+train_novo$gastos <- train_novo$total_receita - train_novo$total_despesa
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -288,7 +293,7 @@ train_novo$ens_superior <- as.factor(train_novo$ens_superior)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-train_novo$ocupacao <- as.factor(train_novo$ocupacao)
+train$ocupacao <- as.factor(train$ocupacao)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -301,17 +306,31 @@ train_novo <- train_novo %>%
          -grau,
          -ano,
          -sexo,
-         -partido)
+         -partido,
+         -ocupacao)
 ```
 
 2 melhores modelos: dt e ada.
-
 
 ```{r, warning=FALSE, message=FALSE}
 modelo.dt.novo <- train(situacao ~ .,
                 data = train_novo,
                 method = "rpart",
                 trControl = VC)
+```
+
+```{r, warning=FALSE, message=FALSE}
+saveRDS(modelo.dt.novo, file="modelo_dt_novo.rds")
+modelo.dt.novo <- readRDS(file="modelo_dt_novo.rds")
+```
+
+```{r, warning=FALSE, message=FALSE}
+modelo.dt.novo
+```
+
+```{r, warning=FALSE, message=FALSE}
+confusion.dt.novo <- confusionMatrix(modelo.dt.novo)
+confusion.dt.novo
 ```
 
 
@@ -330,7 +349,6 @@ modelo.ada.novo <- readRDS(file="modelo_ada_novo.rds")
 ```{r, warning=FALSE, message=FALSE}
 modelo.ada.novo
 ```
-
 
 5.Envie seus melhores modelos à competição do Kaggle. 
   Faça pelo menos uma submissão. 

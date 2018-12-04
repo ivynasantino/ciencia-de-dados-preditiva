@@ -209,7 +209,6 @@ Obs.: O que significa cada parâmentro modularizado acima:
 
   - Precision: proporção de predições positivas que são realmente positivas.
   - Recall: proporção de predições que foram corretamente classificadas.
-  - F_measure:
   - Acurácia: proporção de predições corretamente classificadas, também é dada pela matriz de confusão calculada nos passos anteriores.
 
 #### Regressão logística
@@ -288,7 +287,7 @@ f_measure.ada
 acuracia.ada
 ```
 
-[RESPOSTA]
+Como podemos ver nos resultados acima, todos os modelos que construímos tiveram resultados satisfatórios, principalmente para a acurácia, vista também nos valores acima. Mas queria destacar os valores do Adaboost, que obteve acurácia 0.9 se enquadrando no melhor modelo construído entre os demais desse checkpoint, fora acurácia o valor de recall também foi alto, que significa que sua previsão consegue classificar corretamente, cerca de 0.85.
 
 
 ### 4.Interprete as saídas dos modelos. Quais atributos parecem ser mais importantes de acordo com cada modelo? Crie pelo menos um novo atributo que não está nos dados originais e estude o impacto desse atributo
@@ -411,14 +410,6 @@ submissao <- test %>%
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-test$gastos <- test$total_receita - test$total_despesa
-
-test$deputado <- ifelse(test$ocupacao == "DEPUTADO", TRUE, FALSE)
-test$deputado <- as.factor(test$deputado)
-
-test$ens_superior <- ifelse(test$grau == "SUPERIOR COMPLETO", TRUE, FALSE)
-test$ens_superior <- as.factor(test$ens_superior)
-
 test <- test %>% 
   select(-cargo,
          -sequencial_candidato,
@@ -428,12 +419,11 @@ test <- test %>%
          -grau,
          -ano,
          -sexo,
-         -partido,
-         -ocupacao)
+         -partido)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-predicao <- predict(modelo.ada.novo, test)
+predicao <- predict(modelo.ada, test)
 submissao$situacao <- predicao
 
 submissao <- submissao %>% 

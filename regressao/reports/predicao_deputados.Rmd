@@ -55,17 +55,23 @@ train$ocupacao <- as.factor(train$ocupacao)
 ```{r, warning=FALSE, message=FALSE}
 quantidade_situacao <- table(train$situacao)
 quantidade_situacao
+
 ```
+
 
 ```{r, warning=FALSE, message=FALSE}
 proporcaoEleito <- quantidade_situacao[1]/(quantidade_situacao[1] + quantidade_situacao[2])
 proporcaoEleito
+
 ```
+
 ```{r, warning=FALSE, message=FALSE}
 proporcaoNEleito <- quantidade_situacao[2]/(quantidade_situacao[1] + quantidade_situacao[2])
 proporcaoNEleito
+
 ```
 
+ 
 Temos um desbalanceamento dos dados com relação a quantidade de parlamentares eleitos e não eleitos, como podemos ver acima, com proporção de 13% para eleitos e 86% para não eleitos. Dessa maneira, com este cenário de desbalanceamento de classes o nosso classificador poderá dar resultados mais precisos para classes com maior proporção e errar quanto aos resultados das classes que possuem menor proporção de dados. Por isso, podemos tratar isso com parâmentros de balanceamento na validação cruzada. 
 
 ### 2.Treine: um modelo de regressão logística, uma árvore de decisão e um modelo de adaboost. Tune esses modelos usando validação cruzada e controle overfitting se necessário, considerando as particularidades de cada modelo.  
@@ -379,7 +385,7 @@ confusion.dt.novo
 
 ```{r, warning=FALSE, message=FALSE}
 #saveRDS(modelo.ada.novo, file="modelo_ada_novo.rds")
-modelo.ada.novo <- readRDS(file="modelo_ada_novo.rds")
+#modelo.ada.novo <- readRDS(file="modelo_ada_novo.rds")
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -407,7 +413,6 @@ test = read.csv(here("data/situacao/test.csv"))
 ```{r, warning=FALSE, message=FALSE}
 submissao <- test %>% 
   select(sequencial_candidato)
-
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -424,18 +429,18 @@ test <- test %>%
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-predicao <- predict(modelo.ada, test)
-submissao$Predicted <- predicao
-
-submissao <- submissao %>% 
-  select(ID = sequencial_candidato,
-         Predicted = Predicted)
+# predicao <- predict(modelo.ada, test)
+# submissao$Predicted <- predicao
+# 
+# submissao <- submissao %>% 
+#   select(ID = sequencial_candidato,
+#          Predicted = Predicted)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-write.csv(x = submissao,
-          file = "../data/situacao/submissao.csv",
-          row.names = FALSE)
+# write.csv(x = submissao,
+#           file = "../data/situacao/submissao.csv",
+#           row.names = FALSE)
 
 
 ```

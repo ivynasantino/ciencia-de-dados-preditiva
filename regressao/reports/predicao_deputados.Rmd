@@ -112,14 +112,15 @@ confusion.rl
 #                 trControl = VC)
 ```
 
-```{r, warning=FALSE, message=FALSE}
-modelo.knn
-```
-
 
 ```{r, warning=FALSE, message=FALSE, include=FALSE}
 #saveRDS(modelo.knn, file="modelo_knn.rds")
 modelo.knn <- readRDS(file="modelo_knn.rds")
+```
+
+
+```{r, warning=FALSE, message=FALSE}
+modelo.knn
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -424,11 +425,11 @@ test <- test %>%
 
 ```{r, warning=FALSE, message=FALSE}
 predicao <- predict(modelo.ada, test)
-submissao$situacao <- predicao
+submissao$Predicted <- predicao
 
 submissao <- submissao %>% 
   select(ID = sequencial_candidato,
-         situacao = situacao)
+         Predicted = Predicted)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
